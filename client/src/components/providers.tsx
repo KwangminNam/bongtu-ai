@@ -1,6 +1,7 @@
 "use client";
 
 import { SessionProvider, useSession } from "next-auth/react";
+import { ThemeProvider } from "next-themes";
 import { useEffect } from "react";
 import { client } from "@/lib/fetch-client";
 
@@ -21,7 +22,9 @@ function AuthTokenSetter({ children }: { children: React.ReactNode }) {
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <SessionProvider>
-      <AuthTokenSetter>{children}</AuthTokenSetter>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <AuthTokenSetter>{children}</AuthTokenSetter>
+      </ThemeProvider>
     </SessionProvider>
   );
 }

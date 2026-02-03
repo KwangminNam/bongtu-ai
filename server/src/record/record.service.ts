@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateRecordDto } from './dto/create-record.dto.js';
+import { UpdateRecordDto } from './dto/update-record.dto.js';
 
 @Injectable()
 export class RecordService {
@@ -41,6 +42,13 @@ export class RecordService {
         eventId: dto.eventId,
         friendId,
       })),
+    });
+  }
+
+  async update(id: string, userId: string, dto: UpdateRecordDto) {
+    return this.prisma.record.updateMany({
+      where: { id, event: { userId } },
+      data: dto,
     });
   }
 

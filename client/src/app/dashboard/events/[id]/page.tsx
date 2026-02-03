@@ -3,19 +3,13 @@ import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { createFetchClient } from "@/lib/fetch-client";
 import { auth } from "@/lib/auth";
 import { BackButton } from "@/components/back-button";
+import { EditEventForm } from "./edit-event-form";
+import { RecordList } from "./record-list";
 import type { EventDetail } from "@/lib/api";
 
-const TYPE_LABEL: Record<string, string> = {
-  WEDDING: "결혼",
-  FUNERAL: "장례",
-  BIRTHDAY: "생일/잔치",
-  ETC: "기타",
-};
 
 async function getEvent(id: string): Promise<EventDetail | null> {
   const session = await auth();
@@ -33,16 +27,31 @@ async function getEvent(id: string): Promise<EventDetail | null> {
   }
 }
 
-function EventDetailSkeleton() {
+function EventContentSkeleton() {
   return (
-    <div className="flex flex-col px-5 pt-14 pb-4">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="h-5 w-5 bg-muted rounded animate-pulse" />
-        <div className="h-6 w-32 bg-muted rounded animate-pulse" />
+    <>
+      {/* 대시보드 스켈레톤 */}
+      <div className="flex flex-col gap-3 mb-6">
+        <Card className="p-4 animate-pulse">
+          <div className="h-10 bg-muted rounded" />
+        </Card>
+        <div className="grid grid-cols-2 gap-3">
+          <Card className="p-4 animate-pulse">
+            <div className="h-14 bg-muted rounded" />
+          </Card>
+          <Card className="p-4 animate-pulse">
+            <div className="h-14 bg-muted rounded" />
+          </Card>
+        </div>
+        <Card className="p-4 animate-pulse">
+          <div className="h-8 bg-muted rounded" />
+        </Card>
       </div>
-      <Card className="p-4 mb-6 animate-pulse">
-        <div className="h-20 bg-muted rounded" />
-      </Card>
+
+      <div className="flex items-center justify-between mb-4">
+        <div className="h-5 w-20 bg-muted rounded animate-pulse" />
+        <div className="h-8 w-24 bg-muted rounded animate-pulse" />
+      </div>
       <div className="flex flex-col gap-2">
         {[1, 2, 3].map((i) => (
           <Card key={i} className="p-3 animate-pulse">
@@ -50,85 +59,55 @@ function EventDetailSkeleton() {
           </Card>
         ))}
       </div>
-    </div>
+    </>
   );
 }
 
-async function EventDetailContent({ id }: { id: string }) {
+async function EventTitle({ id }: { id: string }) {
+  const event = await getEvent(id);
+  return <h1 className="text-xl font-bold">{event?.title ?? "이벤트"}</h1>;
+}
+
+async function EventContent({ id }: { id: string }) {
   const event = await getEvent(id);
 
   if (!event) {
     return (
-      <div className="flex items-center justify-center min-h-dvh">
-        <p className="text-sm text-muted-foreground">이벤트를 찾을 수 없습니다</p>
-      </div>
+      <p className="text-sm text-muted-foreground text-center py-10">
+        이벤트를 찾을 수 없습니다
+      </p>
     );
   }
 
-  const totalAmount = event.records.reduce((sum, r) => sum + r.amount, 0);
+  const receivedAmount = event.records.reduce((sum, r) => sum + r.amount, 0);
 
   return (
-    <div className="flex flex-col px-5 pt-14 pb-4">
-      {/* 헤더 */}
-      <div className="flex items-center gap-3 mb-4">
-        <BackButton />
-        <h1 className="text-xl font-bold">{event.title}</h1>
-      </div>
-
-      {/* 요약 카드 */}
-      <Card className="p-4 mb-6">
-        <div className="flex justify-between items-center">
-          <div className="text-sm text-muted-foreground">
-            {new Date(event.date).toLocaleDateString("ko-KR")}
-          </div>
-          <Badge variant="secondary">
-            {TYPE_LABEL[event.type] || event.type}
-          </Badge>
-        </div>
-        <Separator className="my-3" />
-        <div className="flex justify-between items-end">
-          <div>
-            <div className="text-sm text-muted-foreground">총 금액</div>
-            <div className="text-2xl font-bold">
-              {totalAmount.toLocaleString()}원
-            </div>
-          </div>
-          <div className="text-sm text-muted-foreground">
-            {event.records.length}명
-          </div>
-        </div>
-      </Card>
+    <>
+      {/* 대시보드 + 수정 폼 (토글) */}
+      <EditEventForm
+        eventId={event.id}
+        initialTitle={event.title}
+        initialType={event.type}
+        initialDate={event.date}
+        receivedAmount={receivedAmount}
+        sentAmount={event.sentTotalAmount}
+        recordCount={event.records.length}
+      />
 
       {/* 기록 추가 버튼 */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-semibold">내역 목록</h2>
         <Button size="sm" variant="outline" asChild>
-          <Link href={`/dashboard/events/${id}/record`}>
+          <Link href={`/dashboard/events/${event.id}/record`}>
             <Plus size={14} className="mr-1" />
             기록 추가
           </Link>
         </Button>
       </div>
 
-      {/* 내역 리스트 */}
-      <div className="flex flex-col gap-2">
-        {event.records.map((record) => (
-          <Card key={record.id} className="p-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="font-medium text-sm">{record.friend.name}</div>
-                <div className="text-xs text-muted-foreground">
-                  {record.friend.relation}
-                </div>
-              </div>
-              <div className="font-semibold text-sm">
-                {record.amount.toLocaleString()}원
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
-    </div>
+      {/* 내역 리스트 (수정/삭제 가능) */}
+      <RecordList records={event.records} eventId={event.id} />
+    </>
   );
 }
 
@@ -140,8 +119,19 @@ export default async function EventDetailPage({
   const { id } = await params;
 
   return (
-    <Suspense fallback={<EventDetailSkeleton />}>
-      <EventDetailContent id={id} />
-    </Suspense>
+    <div className="flex flex-col px-5 pt-14 pb-4">
+      {/* 헤더 - BackButton 즉시 표시 */}
+      <div className="flex items-center gap-3 mb-4">
+        <BackButton />
+        <Suspense fallback={<div className="h-6 w-32 bg-muted rounded animate-pulse" />}>
+          <EventTitle id={id} />
+        </Suspense>
+      </div>
+
+      {/* 콘텐츠 */}
+      <Suspense fallback={<EventContentSkeleton />}>
+        <EventContent id={id} />
+      </Suspense>
+    </div>
   );
 }

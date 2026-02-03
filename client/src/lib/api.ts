@@ -22,7 +22,14 @@ export const api = {
     byEvent: (eventId: string) => client.get<GiftRecord[]>("/records", { eventId }),
     byFriend: (friendId: string) => client.get<GiftRecord[]>("/records", { friendId }),
     create: (data: CreateRecord) => client.post<GiftRecord>("/records", data),
+    update: (id: string, data: UpdateRecord) => client.patch<GiftRecord>(`/records/${id}`, data),
     delete: (id: string) => client.delete(`/records/${id}`),
+  },
+
+  sentRecords: {
+    byFriend: (friendId: string) => client.get<SentRecord[]>("/sent-records", { friendId }),
+    create: (data: CreateSentRecord) => client.post<SentRecord>("/sent-records", data),
+    delete: (id: string) => client.delete(`/sent-records/${id}`),
   },
 };
 
@@ -44,8 +51,9 @@ export interface EventDetail {
     id: string;
     amount: number;
     memo: string | null;
-    friend: { name: string; relation: string };
+    friend: { id: string; name: string; relation: string };
   }[];
+  sentTotalAmount: number; // 해당 이벤트 참여자들에게 보낸 총액
 }
 
 export interface Friend {
@@ -53,6 +61,7 @@ export interface Friend {
   name: string;
   relation: string;
   records: { amount: number; event: { type: string } }[];
+  sentRecords?: { amount: number; eventType: string }[];
 }
 
 export interface FriendDetail {
@@ -65,6 +74,16 @@ export interface FriendDetail {
     memo: string | null;
     event: { title: string; type: string; date: string };
   }[];
+  sentRecords: SentRecord[];
+}
+
+export interface SentRecord {
+  id: string;
+  amount: number;
+  date: string;
+  eventType: string;
+  memo: string | null;
+  friendId: string;
 }
 
 export interface GiftRecord {
@@ -92,6 +111,19 @@ export interface CreateRecord {
   eventId: string;
   friendId?: string;
   friendIds?: string[];
+}
+
+export interface UpdateRecord {
+  amount?: number;
+  memo?: string;
+}
+
+export interface CreateSentRecord {
+  amount: number;
+  date: string;
+  eventType: string;
+  memo?: string;
+  friendId: string;
 }
 
 export { client };

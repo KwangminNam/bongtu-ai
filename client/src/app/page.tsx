@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 export default function LoginPage() {
   return (
-    <div className="flex flex-col min-h-dvh px-8">
+    <div className="flex flex-col h-full px-8">
       {/* 상단 여백 + 로고 영역 */}
       <div className="flex-1 flex flex-col items-center justify-center gap-3">
         <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center">

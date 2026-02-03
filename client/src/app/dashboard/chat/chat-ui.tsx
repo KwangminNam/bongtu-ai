@@ -1,18 +1,13 @@
 "use client";
 
 import { useRef, useEffect, useState, useCallback } from "react";
-import { Send, Bot, User, Loader2 } from "lucide-react";
+import { Send, Bot, User, Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { BackButton } from "@/components/back-button";
 import { cn } from "@/lib/utils";
-
-interface Message {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-}
+import { useChatStore } from "@/lib/stores/chat";
 
 const SUGGESTIONS = [
   "내 경조사 기록 요약해줘",
@@ -22,7 +17,8 @@ const SUGGESTIONS = [
 ];
 
 export function ChatUI() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const { messages, addMessage, updateLastAssistantMessage, clearMessages } =
+    useChatStore();
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -33,75 +29,67 @@ export function ChatUI() {
     }
   }, [messages]);
 
-  const sendMessage = useCallback(async (content: string) => {
-    if (!content.trim() || isLoading) return;
+  const sendMessage = useCallback(
+    async (content: string) => {
+      if (!content.trim() || isLoading) return;
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: "user",
-      content,
-    };
+      const userMessage = {
+        id: Date.now().toString(),
+        role: "user" as const,
+        content,
+      };
 
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-    setIsLoading(true);
+      addMessage(userMessage);
+      setInput("");
+      setIsLoading(true);
 
-    const assistantMessage: Message = {
-      id: (Date.now() + 1).toString(),
-      role: "assistant",
-      content: "",
-    };
+      const assistantMessage = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant" as const,
+        content: "",
+      };
 
-    setMessages((prev) => [...prev, assistantMessage]);
+      addMessage(assistantMessage);
 
-    try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: [...messages, userMessage].map((m) => ({
-            role: m.role,
-            content: m.content,
-          })),
-        }),
-      });
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            messages: [...messages, userMessage].map((m) => ({
+              role: m.role,
+              content: m.content,
+            })),
+          }),
+        });
 
-      if (!response.ok) throw new Error("API Error");
+        if (!response.ok) throw new Error("API Error");
 
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
+        const reader = response.body?.getReader();
+        const decoder = new TextDecoder();
 
-      if (reader) {
-        let fullContent = "";
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
+        if (reader) {
+          let fullContent = "";
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
 
-          const chunk = decoder.decode(value);
-          fullContent += chunk;
+            const chunk = decoder.decode(value);
+            fullContent += chunk;
 
-          setMessages((prev) =>
-            prev.map((msg, idx) =>
-              idx === prev.length - 1 && msg.role === "assistant"
-                ? { ...msg, content: fullContent }
-                : msg
-            )
-          );
+            updateLastAssistantMessage(fullContent);
+          }
         }
+      } catch {
+        updateLastAssistantMessage(
+          "죄송합니다. 오류가 발생했습니다. 다시 시도해주세요."
+        );
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      setMessages((prev) => {
-        const newMessages = [...prev];
-        const lastMessage = newMessages[newMessages.length - 1];
-        if (lastMessage.role === "assistant") {
-          lastMessage.content = "죄송합니다. 오류가 발생했습니다. 다시 시도해주세요.";
-        }
-        return newMessages;
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }, [messages, isLoading]);
+    },
+    [messages, isLoading, addMessage, updateLastAssistantMessage]
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,16 +101,26 @@ export function ChatUI() {
   };
 
   return (
-    <div className="flex flex-col h-dvh">
+    <div className="flex flex-col h-full">
       {/* 헤더 */}
       <div className="flex items-center gap-3 px-5 pt-14 pb-4 border-b">
         <BackButton />
-        <div>
+        <div className="flex-1">
           <h1 className="text-xl font-bold">AI 어시스턴트</h1>
           <p className="text-xs text-muted-foreground">
             경조사 기록을 분석하고 제안해드려요
           </p>
         </div>
+        {messages.length > 0 && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={clearMessages}
+            className="text-muted-foreground"
+          >
+            <Trash2 size={18} />
+          </Button>
+        )}
       </div>
 
       {/* 메시지 영역 */}

@@ -20,7 +20,31 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     async jwt({ token, user, account }) {
       if (account && user) {
-        token.userId = user.id;
+        // DB에 유저 생성/조회 후 DB의 user ID를 토큰에 저장
+        try {
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/users/sync`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                email: user.email,
+                name: user.name,
+                image: user.image,
+              }),
+            }
+          );
+          if (res.ok) {
+            const dbUser = await res.json();
+            token.userId = dbUser.id; // DB의 UUID 사용
+          } else {
+            console.error("Failed to sync user:", await res.text());
+            token.userId = user.id; // fallback
+          }
+        } catch (error) {
+          console.error("Failed to sync user:", error);
+          token.userId = user.id; // fallback
+        }
       }
       return token;
     },

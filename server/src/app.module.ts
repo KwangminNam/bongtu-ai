@@ -6,6 +6,7 @@ import { UserModule } from './user/user.module.js';
 import { EventModule } from './event/event.module.js';
 import { FriendModule } from './friend/friend.module.js';
 import { RecordModule } from './record/record.module.js';
+import { SentRecordModule } from './sent-record/sent-record.module.js';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { RecordModule } from './record/record.module.js';
     EventModule,
     FriendModule,
     RecordModule,
+    SentRecordModule,
   ],
 })
 export class AppModule {}

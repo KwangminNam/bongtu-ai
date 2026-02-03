@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, use } from "react";
+import { useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Plus, X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +10,11 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { BackButton } from "@/components/back-button";
 import { api, type Friend } from "@/lib/api";
+import { revalidateEventDetail, revalidateFriends } from "@/lib/actions";
+import {
+  ExistingFriendsList,
+  ExistingFriendsListSkeleton,
+} from "./existing-friends-list";
 
 const AMOUNT_BADGES = [
   { value: 30000, label: "3만" },
@@ -31,7 +36,6 @@ interface NewFriend {
 }
 
 export function RecordForm({ eventId, friendsPromise }: RecordFormProps) {
-  const existingFriends = use(friendsPromise);
   const router = useRouter();
 
   // 금액
@@ -50,7 +54,9 @@ export function RecordForm({ eventId, friendsPromise }: RecordFormProps) {
   const [submitting, setSubmitting] = useState(false);
 
   const amount = selectedAmount ?? (customAmount ? Number(customAmount) : 0);
-  const totalPeople = selectedFriendIds.length + newFriends.length;
+  // 입력 중인 새 지인도 카운트에 포함
+  const hasPendingNewFriend = newName.trim() && newRelation.trim();
+  const totalPeople = selectedFriendIds.length + newFriends.length + (hasPendingNewFriend ? 1 : 0);
 
   const toggleExistingFriend = (friendId: string) => {
     setSelectedFriendIds((prev) =>
@@ -76,9 +82,15 @@ export function RecordForm({ eventId, friendsPromise }: RecordFormProps) {
 
     setSubmitting(true);
     try {
+      // 입력 중인 새 지인이 있으면 자동 추가
+      const friendsToCreate = [...newFriends];
+      if (newName.trim() && newRelation.trim()) {
+        friendsToCreate.push({ name: newName.trim(), relation: newRelation.trim() });
+      }
+
       // 1. 새 지인들 먼저 생성
       const createdFriendIds: string[] = [];
-      for (const friend of newFriends) {
+      for (const friend of friendsToCreate) {
         const created = await api.friends.create(friend);
         createdFriendIds.push(created.id);
       }
@@ -94,6 +106,12 @@ export function RecordForm({ eventId, friendsPromise }: RecordFormProps) {
         friendIds: allFriendIds,
       });
 
+      // 4. 캐시 무효화
+      await revalidateEventDetail(eventId);
+      if (friendsToCreate.length > 0) {
+        await revalidateFriends();
+      }
+
       router.back();
     } catch {
       alert("기록 등록에 실패했습니다");
@@ -103,7 +121,7 @@ export function RecordForm({ eventId, friendsPromise }: RecordFormProps) {
   };
 
   return (
-    <div className="flex flex-col px-5 pt-14 pb-4 min-h-dvh">
+    <div className="flex flex-col px-5 pt-14 pb-4 h-full">
       {/* 헤더 */}
       <div className="flex items-center gap-3 mb-6">
         <BackButton />
@@ -206,43 +224,14 @@ export function RecordForm({ eventId, friendsPromise }: RecordFormProps) {
         )}
       </div>
 
-      {/* 3. 기존 지인 선택 (있을 경우) */}
-      {existingFriends.length > 0 && (
-        <div className="mb-6">
-          <Label className="mb-3 block">
-            기존 지인에서 선택{" "}
-            <span className="text-muted-foreground font-normal">
-              ({selectedFriendIds.length}명 선택)
-            </span>
-          </Label>
-          <div className="flex flex-col gap-2 max-h-[200px] overflow-y-auto">
-            {existingFriends.map((friend) => {
-              const isSelected = selectedFriendIds.includes(friend.id);
-              return (
-                <Card
-                  key={friend.id}
-                  className={`p-3 cursor-pointer transition-colors ${
-                    isSelected
-                      ? "border-primary bg-primary/5"
-                      : "hover:bg-accent/50"
-                  }`}
-                  onClick={() => toggleExistingFriend(friend.id)}
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="font-medium text-sm">{friend.name}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {friend.relation}
-                      </div>
-                    </div>
-                    {isSelected && <Check size={16} className="text-primary" />}
-                  </div>
-                </Card>
-              );
-            })}
-          </div>
-        </div>
-      )}
+      {/* 3. 기존 지인 선택 */}
+      <Suspense fallback={<ExistingFriendsListSkeleton />}>
+        <ExistingFriendsList
+          friendsPromise={friendsPromise}
+          selectedFriendIds={selectedFriendIds}
+          onToggle={toggleExistingFriend}
+        />
+      </Suspense>
 
       {/* 4. 메모 */}
       <div className="mb-6">

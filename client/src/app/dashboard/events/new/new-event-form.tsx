@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { BackButton } from "@/components/back-button";
 import { api } from "@/lib/api";
+import { revalidateDashboard } from "@/lib/actions";
 
 const EVENT_TYPES = [
   { value: "WEDDING", label: "결혼식" },
@@ -34,6 +35,7 @@ export function NewEventForm() {
     setSubmitting(true);
     try {
       await api.events.create({ title, type, date });
+      await revalidateDashboard();
       router.push("/dashboard");
     } catch {
       alert("이벤트 등록에 실패했습니다");

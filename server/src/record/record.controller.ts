@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Delete,
   Param,
   Body,
@@ -12,6 +13,7 @@ import { RecordService } from './record.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 import { CreateRecordDto } from './dto/create-record.dto.js';
+import { UpdateRecordDto } from './dto/update-record.dto.js';
 
 @UseGuards(JwtAuthGuard)
 @Controller('records')
@@ -32,6 +34,15 @@ export class RecordController {
   @Post()
   create(@CurrentUser() user: { id: string }, @Body() dto: CreateRecordDto) {
     return this.recordService.create(user.id, dto);
+  }
+
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @CurrentUser() user: { id: string },
+    @Body() dto: UpdateRecordDto,
+  ) {
+    return this.recordService.update(id, user.id, dto);
   }
 
   @Delete(':id')

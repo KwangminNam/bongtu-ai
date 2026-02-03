@@ -14,6 +14,9 @@ export class FriendService {
         records: {
           select: { amount: true, event: { select: { type: true } } },
         },
+        sentRecords: {
+          select: { amount: true, eventType: true, date: true, memo: true },
+        },
       },
       orderBy: { name: 'asc' },
     });
@@ -28,6 +31,9 @@ export class FriendService {
             event: { select: { title: true, type: true, date: true } },
           },
           orderBy: { createdAt: 'desc' },
+        },
+        sentRecords: {
+          orderBy: { date: 'desc' },
         },
       },
     });

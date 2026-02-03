@@ -18,15 +18,42 @@ export class EventService {
   }
 
   async findOne(id: string, userId: string) {
-    return this.prisma.event.findFirst({
+    const event = await this.prisma.event.findFirst({
       where: { id, userId },
       include: {
         records: {
-          include: { friend: { select: { name: true, relation: true } } },
+          include: {
+            friend: {
+              select: {
+                id: true,
+                name: true,
+                relation: true,
+              },
+            },
+          },
           orderBy: { createdAt: 'desc' },
         },
       },
     });
+
+    if (!event) return null;
+
+    // 해당 이벤트에 참여한 친구들의 ID 목록
+    const friendIds = event.records.map((r) => r.friend.id);
+
+    // 해당 친구들에게 보낸 총 금액 계산
+    const sentTotal = await this.prisma.sentRecord.aggregate({
+      where: {
+        userId,
+        friendId: { in: friendIds },
+      },
+      _sum: { amount: true },
+    });
+
+    return {
+      ...event,
+      sentTotalAmount: sentTotal._sum.amount || 0,
+    };
   }
 
   async create(userId: string, dto: CreateEventDto) {

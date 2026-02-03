@@ -8,14 +8,15 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String?
-  image     String?
-  events    Event[]
-  friends   Friend[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String       @id @default(uuid())
+  email       String       @unique
+  name        String?
+  image       String?
+  events      Event[]
+  friends     Friend[]
+  sentRecords SentRecord[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
 model Event {
@@ -34,12 +35,13 @@ model Event {
 }
 
 model Friend {
-  id       String   @id @default(uuid())
-  name     String
-  relation String   // 직장 동료, 고교 동창 등 자유 입력
-  userId   String
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  records  Record[]
+  id          String       @id @default(uuid())
+  name        String
+  relation    String       // 직장 동료, 고교 동창 등 자유 입력
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  records     Record[]
+  sentRecords SentRecord[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -61,4 +63,23 @@ model Record {
 
   @@index([friendId])
   @@index([eventId])
+}
+
+// 내가 지인에게 보낸 경조사비 (Payback)
+model SentRecord {
+  id       String   @id @default(uuid())
+  amount   Int      // 금액 (원 단위)
+  date     DateTime // 보낸 날짜
+  eventType String  // WEDDING, FUNERAL, BIRTHDAY, ETC
+  memo     String?
+  friendId String
+  friend   Friend   @relation(fields: [friendId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([friendId])
+  @@index([userId])
 }
