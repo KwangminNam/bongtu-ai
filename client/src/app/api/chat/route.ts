@@ -1,5 +1,5 @@
 import { google } from "@ai-sdk/google";
-import { streamText, tool } from "ai";
+import { streamText, tool, stepCountIs } from "ai";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { createFetchClient } from "@/lib/fetch-client";
@@ -166,7 +166,7 @@ export async function POST(req: Request) {
     tools: {
       createEvent: tool({
         description: "새로운 이벤트(경조사)를 생성합니다. 결혼식, 돌잔치, 생일, 장례식, 집들이, 승진, 개업 등의 이벤트를 추가할 때 사용합니다.",
-        parameters: z.object({
+        inputSchema: z.object({
           title: z.string().describe("이벤트 제목 (예: 나의 결혼식, 아들 돌잔치)"),
           type: z.enum(["결혼", "돌잔치", "생일", "장례", "집들이", "승진", "개업", "기타"]).describe("이벤트 유형"),
           date: z.string().describe("이벤트 날짜 (YYYY-MM-DD 형식)"),
@@ -186,7 +186,7 @@ export async function POST(req: Request) {
 
       createFriend: tool({
         description: "새로운 지인을 추가합니다.",
-        parameters: z.object({
+        inputSchema: z.object({
           name: z.string().describe("지인 이름"),
           relation: z.string().describe("관계 (예: 친구, 직장 동료, 가족, 친척, 선후배)"),
         }),
@@ -205,7 +205,7 @@ export async function POST(req: Request) {
 
       createRecord: tool({
         description: "내 이벤트에서 받은 축의금/부의금 기록을 추가합니다. 먼저 이벤트와 지인이 등록되어 있어야 합니다.",
-        parameters: z.object({
+        inputSchema: z.object({
           eventId: z.string().describe("이벤트 ID"),
           friendId: z.string().describe("지인 ID"),
           amount: z.number().describe("금액 (원)"),
@@ -226,7 +226,7 @@ export async function POST(req: Request) {
 
       createSentRecord: tool({
         description: "지인의 이벤트에 보낸 축의금/부의금 기록을 추가합니다. 먼저 지인이 등록되어 있어야 합니다.",
-        parameters: z.object({
+        inputSchema: z.object({
           friendId: z.string().describe("지인 ID"),
           amount: z.number().describe("금액 (원)"),
           date: z.string().describe("보낸 날짜 (YYYY-MM-DD 형식)"),
@@ -246,13 +246,12 @@ export async function POST(req: Request) {
         },
       }),
     },
-    maxSteps: 5,
+    stopWhen: stepCountIs(5),
     toolChoice: "auto",
-    onStepFinish: ({ stepType, toolCalls, toolResults, text }) => {
+    onStepFinish: ({ toolCalls, toolResults, text }) => {
       console.log("[streamText] Step finished:", {
-        stepType,
-        toolCalls: toolCalls?.map(tc => ({ name: tc.toolName, args: tc.args })),
-        toolResults: toolResults?.map(tr => ({ name: tr.toolName, result: tr.result })),
+        toolCalls: toolCalls?.length,
+        toolResults: toolResults?.length,
         textLength: text?.length,
       });
     },

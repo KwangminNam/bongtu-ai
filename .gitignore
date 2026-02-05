@@ -30,3 +30,6 @@ server/prisma/*.db
 
 # turbo
 .turbo/
+
+# sst
+.sst/

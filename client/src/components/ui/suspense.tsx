@@ -1,7 +1,4 @@
-"use client";
-
 import {
-  ComponentProps,
   PropsWithChildren,
   ReactNode,
   Suspense as ReactSuspense,
