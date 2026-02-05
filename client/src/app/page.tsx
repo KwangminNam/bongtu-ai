@@ -28,14 +28,14 @@ export default function LoginPage() {
           <KakaoIcon />
           카카오로 시작하기
         </Button>
-        <Button
+        {/* <Button
           variant="outline"
           className="w-full h-12 text-base font-medium"
           onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
         >
           <GoogleIcon />
           Google로 시작하기
-        </Button>
+        </Button> */}
         <p className="text-xs text-muted-foreground text-center mt-2">
           로그인 시 서비스 이용약관에 동의하게 됩니다
         </p>

@@ -278,7 +278,7 @@ export function RecordForm({ eventId, friendsPromise }: RecordFormProps) {
       </Card>
 
       {/* 제출 */}
-      <div className="mt-auto py-6">
+      <div className="mt-auto pt-6">
         {amount > 0 && totalPeople > 0 && (
           <Card className="p-4 mb-4 border bg-accent">
             <div className="flex items-center justify-between">
