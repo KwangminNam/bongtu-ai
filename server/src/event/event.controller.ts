@@ -7,6 +7,7 @@ import {
   Param,
   Body,
   UseGuards,
+  Inject,
 } from '@nestjs/common';
 import { EventService } from './event.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
@@ -17,7 +18,7 @@ import { UpdateEventDto } from './dto/update-event.dto.js';
 @UseGuards(JwtAuthGuard)
 @Controller('events')
 export class EventController {
-  constructor(private eventService: EventService) {}
+  constructor(@Inject(EventService) private eventService: EventService) {}
 
   @Get()
   findAll(@CurrentUser() user: { id: string }) {

@@ -6,7 +6,14 @@ export function Api({ stack }: StackContext) {
     runtime: "nodejs20.x",
     timeout: 30,
     memorySize: 512,
-    url: true,
+    url: {
+      cors: {
+        allowedOrigins: ["http://localhost:3000", "https://maeum-jangbu.vercel.app"],
+        allowedMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization", "Accept"],
+        allowCredentials: true,
+      },
+    },
     environment: {
       DATABASE_URL: process.env.DATABASE_URL!,
       JWT_SECRET: process.env.JWT_SECRET!,

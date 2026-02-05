@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateRecordDto } from './dto/create-record.dto.js';
 import { UpdateRecordDto } from './dto/update-record.dto.js';
 
 @Injectable()
 export class RecordService {
-  constructor(private prisma: PrismaService) {}
+  constructor(@Inject(PrismaService) private prisma: PrismaService) {}
 
   async findByEvent(eventId: string, userId: string) {
     return this.prisma.record.findMany({

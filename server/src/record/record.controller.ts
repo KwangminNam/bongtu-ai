@@ -8,6 +8,7 @@ import {
   Body,
   Query,
   UseGuards,
+  Inject,
 } from '@nestjs/common';
 import { RecordService } from './record.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
@@ -18,7 +19,7 @@ import { UpdateRecordDto } from './dto/update-record.dto.js';
 @UseGuards(JwtAuthGuard)
 @Controller('records')
 export class RecordController {
-  constructor(private recordService: RecordService) {}
+  constructor(@Inject(RecordService) private recordService: RecordService) {}
 
   @Get()
   find(

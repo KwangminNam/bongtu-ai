@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Inject } from '@nestjs/common';
 import { UserService } from './user.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 
 @Controller('users')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(@Inject(UserService) private userService: UserService) {}
 
   /** NextAuth JWT callback에서 호출 — 소셜 로그인 시 유저 findOrCreate */
   @Post('sync')

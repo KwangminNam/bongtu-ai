@@ -7,6 +7,7 @@ import {
   Body,
   Query,
   UseGuards,
+  Inject,
 } from '@nestjs/common';
 import { SentRecordService } from './sent-record.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
@@ -16,7 +17,7 @@ import { CreateSentRecordDto } from './dto/create-sent-record.dto.js';
 @UseGuards(JwtAuthGuard)
 @Controller('sent-records')
 export class SentRecordController {
-  constructor(private sentRecordService: SentRecordService) {}
+  constructor(@Inject(SentRecordService) private sentRecordService: SentRecordService) {}
 
   @Get()
   find(

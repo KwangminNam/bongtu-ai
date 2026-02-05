@@ -9,13 +9,7 @@ let cachedServer: Handler;
 async function bootstrap(): Promise<Handler> {
   const app = await NestFactory.create(AppModule);
 
-  app.enableCors({
-    origin: [
-      "http://localhost:3000",
-      process.env.CORS_ORIGIN || "https://your-app.vercel.app",
-    ],
-    credentials: true,
-  });
+  // CORS is handled by Lambda Function URL configuration
 
   app.useGlobalPipes(
     new ValidationPipe({

@@ -7,6 +7,7 @@ import {
   Param,
   Body,
   UseGuards,
+  Inject,
 } from '@nestjs/common';
 import { FriendService } from './friend.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
@@ -17,7 +18,7 @@ import { UpdateFriendDto } from './dto/update-friend.dto.js';
 @UseGuards(JwtAuthGuard)
 @Controller('friends')
 export class FriendController {
-  constructor(private friendService: FriendService) {}
+  constructor(@Inject(FriendService) private friendService: FriendService) {}
 
   @Get()
   findAll(@CurrentUser() user: { id: string }) {

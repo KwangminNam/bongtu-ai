@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateSentRecordDto } from './dto/create-sent-record.dto.js';
 
 @Injectable()
 export class SentRecordService {
-  constructor(private prisma: PrismaService) {}
+  constructor(@Inject(PrismaService) private prisma: PrismaService) {}
 
   async findByFriend(friendId: string, userId: string) {
     return this.prisma.sentRecord.findMany({
