@@ -8,6 +8,8 @@ export const api = {
     create: (data: CreateEvent) => client.post<Event>("/events", data),
     update: (id: string, data: Partial<CreateEvent>) => client.patch<Event>(`/events/${id}`, data),
     delete: (id: string) => client.delete(`/events/${id}`),
+    ocr: (image: string) => client.post<OcrExtractResult>("/events/ocr", { image }),
+    ocrBulk: (data: CreateEventOcr) => client.post<OcrBulkResult>("/events/ocr-bulk", data),
   },
 
   friends: {
@@ -124,6 +126,38 @@ export interface CreateSentRecord {
   eventType: string;
   memo?: string;
   friendId: string;
+}
+
+export interface OcrRecord {
+  name: string;
+  amount: number;
+  relation?: string;
+}
+
+export interface OcrExtractResult {
+  records: OcrRecord[];
+}
+
+export interface CreateEventOcr {
+  title: string;
+  type: string;
+  date: string;
+  records: OcrRecord[];
+}
+
+export interface OcrBulkResult {
+  event: Event;
+  records: {
+    name: string;
+    amount: number;
+    friendId: string;
+    isNewFriend: boolean;
+  }[];
+  summary: {
+    totalRecords: number;
+    totalAmount: number;
+    newFriends: number;
+  };
 }
 
 export { client };

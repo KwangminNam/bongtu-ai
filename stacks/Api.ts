@@ -5,7 +5,7 @@ export function Api({ stack }: StackContext) {
     handler: "server/src/lambda.handler",
     runtime: "nodejs20.x",
     timeout: 30,
-    memorySize: 512,
+    memorySize: 1024,
     url: {
       cors: {
         allowedOrigins: ["http://localhost:3000", "https://maeum-jangbu.vercel.app"],
@@ -37,6 +37,7 @@ export function Api({ stack }: StackContext) {
         "@nestjs/passport",
         "passport",
         "passport-jwt",
+        "@google/generative-ai",
       ],
       esbuild: {
         external: [

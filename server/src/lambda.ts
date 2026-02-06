@@ -3,13 +3,15 @@ import { NestFactory } from "@nestjs/core";
 import { ValidationPipe } from "@nestjs/common";
 import { AppModule } from "./app.module.js";
 import { Handler, Context, Callback } from "aws-lambda";
+import { json } from "express";
 
 let cachedServer: Handler;
 
 async function bootstrap(): Promise<Handler> {
   const app = await NestFactory.create(AppModule);
 
-  // CORS is handled by Lambda Function URL configuration
+  // 이미지 업로드를 위해 body 크기 제한 증가 (10MB)
+  app.use(json({ limit: "10mb" }));
 
   app.useGlobalPipes(
     new ValidationPipe({
