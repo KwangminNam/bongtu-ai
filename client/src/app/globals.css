@@ -183,4 +183,13 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* 스크롤바 숨기기 */
+  * {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  *::-webkit-scrollbar {
+    display: none;
+  }
 }

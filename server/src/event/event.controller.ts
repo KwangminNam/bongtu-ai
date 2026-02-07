@@ -67,4 +67,9 @@ export class EventController {
   ) {
     return this.eventService.createFromOcr(user.id, dto);
   }
+
+  @Get('gold-price')
+  async getGoldPrice() {
+    return this.ocrService.getGoldPrice();
+  }
 }

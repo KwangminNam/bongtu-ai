@@ -21,10 +21,10 @@ export default function DashboardLayout({
 
   return (
     <div className="flex flex-col h-full">
-      <main className="flex-1 overflow-y-auto">{children}</main>
+      <main className="flex-1 overflow-y-auto pb-16">{children}</main>
 
       {/* 하단 탭바 */}
-      <nav className="border-t bg-background">
+      <nav className="absolute bottom-0 left-0 right-0 border-t bg-background/95 backdrop-blur-sm z-50">
         <div className="flex justify-around items-center py-2">
           <NavItem href="/dashboard" icon={<BookOpen size={20} />} label="경조사" active={isActive("/dashboard")} />
           <NavItem href="/dashboard/friends" icon={<Users size={20} />} label="지인" active={isActive("/dashboard/friends")} />

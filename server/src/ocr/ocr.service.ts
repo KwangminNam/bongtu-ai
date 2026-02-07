@@ -6,6 +6,12 @@ export interface OcrRecord {
   amount: number;
 }
 
+export interface GoldPrice {
+  pricePerDon: number;
+  pricePerGram: number;
+  date: string;
+}
+
 @Injectable()
 export class OcrService {
   private genAI: GoogleGenerativeAI;
@@ -14,6 +20,17 @@ export class OcrService {
     this.genAI = new GoogleGenerativeAI(
       process.env.GOOGLE_GENERATIVE_AI_API_KEY!,
     );
+  }
+
+  async getGoldPrice(): Promise<GoldPrice> {
+    const today = new Date().toISOString().split('T')[0];
+    // 2024년 기준 순금 24K 1돈 시세 (약 45만원)
+    // 실제 시세는 한국금거래소 참고: https://www.koreagoldx.co.kr
+    return {
+      pricePerDon: 450000,
+      pricePerGram: 120000,
+      date: today,
+    };
   }
 
   async extractRecordsFromImage(base64Image: string): Promise<OcrRecord[]> {
