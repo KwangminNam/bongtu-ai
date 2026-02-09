@@ -50,13 +50,13 @@ const getYearsSinceEvent = (eventDate: string): number => {
 const getEventIcon = (type: string): ReactNode => {
   switch (type) {
     case "WEDDING":
-      return Heart({ className: "text-pink-500", size: 20 });
+      return <Heart className="text-pink-500" size={20} />;
     case "FUNERAL":
-      return Flower2({ className: "text-purple-400", size: 20 });
+      return <Flower2 className="text-purple-400" size={20} />;
     case "BIRTHDAY":
-      return Cake({ className: "text-yellow-500", size: 20 });
+      return <Cake className="text-yellow-500" size={20} />;
     default:
-      return Sparkles({ className: "text-amber-500", size: 20 });
+      return <Sparkles className="text-amber-500" size={20} />;
   }
 };
 
