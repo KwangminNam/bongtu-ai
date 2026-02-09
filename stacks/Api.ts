@@ -28,6 +28,7 @@ export function Api({ stack }: StackContext) {
         "@nestjs/common",
         "@nestjs/platform-express",
         "@codegenie/serverless-express",
+        "express",
         "reflect-metadata",
         "rxjs",
         "class-validator",

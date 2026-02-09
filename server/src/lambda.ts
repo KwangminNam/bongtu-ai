@@ -4,6 +4,7 @@ import { ValidationPipe } from "@nestjs/common";
 import { AppModule } from "./app.module.js";
 import { Handler, Context, Callback } from "aws-lambda";
 import { json } from "express";
+import { ResponseInterceptor, HttpExceptionFilter } from "./common/index.js";
 
 let cachedServer: Handler;
 
@@ -19,6 +20,8 @@ async function bootstrap(): Promise<Handler> {
       transform: true,
     })
   );
+  app.useGlobalInterceptors(new ResponseInterceptor());
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   await app.init();
 
