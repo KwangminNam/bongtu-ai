@@ -78,7 +78,8 @@ async function FriendContent({ id }: { id: string }) {
     );
   }
 
-  const receivedTotal = friend.records.reduce((sum, r) => sum + r.amount, 0);
+  const records = friend.records ?? [];
+  const receivedTotal = records.reduce((sum, r) => sum + r.amount, 0);
   const sentTotal = friend.sentRecords?.reduce((sum, r) => sum + r.amount, 0) ?? 0;
   const balance = receivedTotal - sentTotal;
 
@@ -111,12 +112,12 @@ async function FriendContent({ id }: { id: string }) {
       {/* 받은 기록 */}
       <h2 className="font-semibold mb-3">받은 기록</h2>
       <div className="flex flex-col gap-2 mb-6">
-        {friend.records.length === 0 ? (
+        {records.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-4">
             받은 기록이 없습니다
           </p>
         ) : (
-          friend.records.map((record) => (
+          records.map((record) => (
             <Card key={record.id} className="p-3">
               <div className="flex items-center justify-between">
                 <div>

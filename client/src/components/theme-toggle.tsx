@@ -16,7 +16,7 @@ export function ThemeToggle() {
   if (!mounted) {
     return (
       <Button variant="ghost" size="icon">
-        <Sun className="size-5" />
+        <span className="size-5" />
       </Button>
     );
   }

@@ -89,7 +89,8 @@ export function EventList({ events }: { events: Event[] }) {
       className="flex flex-col gap-3"
     >
       {events.map((event, index) => {
-        const totalAmount = event.records.reduce((sum, r) => sum + r.amount, 0);
+        const records = event.records ?? [];
+        const totalAmount = records.reduce((sum, r) => sum + r.amount, 0);
         return (
           <motion.div key={event.id} variants={itemVariants}>
             <Link href={`/dashboard/events/${event.id}`}>
@@ -129,7 +130,7 @@ export function EventList({ events }: { events: Event[] }) {
                             })}
                           </span>
                           <span>·</span>
-                          <span>{event.records.length}명</span>
+                          <span>{records.length}명</span>
                         </div>
                       </div>
                     </div>

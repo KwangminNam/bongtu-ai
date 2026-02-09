@@ -146,29 +146,25 @@ class FetchClient {
       data = await response.text();
     }
 
-    // 표준 API 응답 처리 (result/error 형식)
-    const apiResponse = data as ApiResponse<T>;
-
-    if (apiResponse.error) {
-      const apiError = ApiException.fromApiError(apiResponse.error);
-
-      // Apply error interceptors
-      for (const interceptor of this.errorInterceptors) {
-        try {
-          const fallback = await interceptor(
-            new FetchError(response.status, response.statusText, data, response)
-          );
-          if (fallback !== undefined) return fallback as T;
-        } catch (e) {
-          throw e;
-        }
-      }
-
-      throw apiError;
-    }
-
     if (!response.ok) {
       const error = new FetchError(response.status, response.statusText, data, response);
+
+      // 표준 API 에러 응답 처리 (result/error 형식)
+      const apiResponse = data as ApiResponse<T>;
+      if (apiResponse?.error) {
+        const apiError = ApiException.fromApiError(apiResponse.error);
+
+        for (const interceptor of this.errorInterceptors) {
+          try {
+            const fallback = await interceptor(error);
+            if (fallback !== undefined) return fallback as T;
+          } catch (e) {
+            throw e;
+          }
+        }
+
+        throw apiError;
+      }
 
       for (const interceptor of this.errorInterceptors) {
         try {
@@ -182,8 +178,13 @@ class FetchClient {
       throw error;
     }
 
+    // 표준 API 응답 처리 (result/error 형식) - 구 형식도 지원
+    const apiResponse = data as ApiResponse<T>;
+    const isNewFormat = apiResponse && "result" in apiResponse && "error" in apiResponse;
+
+    let result = isNewFormat ? apiResponse.result : data;
+
     // Apply response interceptors
-    let result = apiResponse.result as unknown;
     for (const interceptor of this.responseInterceptors) {
       result = await interceptor(response, result);
     }

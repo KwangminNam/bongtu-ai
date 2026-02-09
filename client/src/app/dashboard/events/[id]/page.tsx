@@ -79,7 +79,8 @@ async function EventContent({ id }: { id: string }) {
     );
   }
 
-  const receivedAmount = event.records.reduce((sum, r) => sum + r.amount, 0);
+  const records = event.records ?? [];
+  const receivedAmount = records.reduce((sum, r) => sum + r.amount, 0);
 
   return (
     <>
@@ -91,7 +92,7 @@ async function EventContent({ id }: { id: string }) {
         initialDate={event.date}
         receivedAmount={receivedAmount}
         sentAmount={event.sentTotalAmount}
-        recordCount={event.records.length}
+        recordCount={records.length}
       />
 
       {/* 기록 추가 버튼 */}
@@ -106,7 +107,7 @@ async function EventContent({ id }: { id: string }) {
       </div>
 
       {/* 내역 리스트 (수정/삭제 가능) */}
-      <RecordList records={event.records} eventId={event.id} />
+      <RecordList records={records} eventId={event.id} />
     </>
   );
 }

@@ -46,7 +46,8 @@ export function FriendCards({
   return (
     <div className="flex flex-col gap-3">
       {filtered.map((friend) => {
-        const totalAmount = friend.records.reduce(
+        const records = friend.records ?? [];
+        const totalAmount = records.reduce(
           (sum, r) => sum + r.amount,
           0
         );
@@ -71,7 +72,7 @@ export function FriendCards({
                         {friend.relation}
                       </span>
                       <span className="text-xs text-muted-foreground">
-                        {friend.records.length}건 · {totalAmount.toLocaleString()}원
+                        {records.length}건 · {totalAmount.toLocaleString()}원
                       </span>
                     </div>
                   </div>
