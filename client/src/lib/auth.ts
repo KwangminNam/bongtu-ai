@@ -39,7 +39,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           );
           if (res.ok) {
             const dbUser = await res.json();
-            token.userId = dbUser.id; // DB의 UUID 사용
+            token.userId = dbUser.result?.id ?? dbUser.id; // ApiResponse 래퍼 처리
           } else {
             console.error("Failed to sync user:", await res.text());
             token.userId = user.id; // fallback

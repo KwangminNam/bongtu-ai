@@ -75,6 +75,75 @@ server/src/
 - **File naming**: kebab-case for components (e.g., `my-component.tsx`), camelCase for hooks (e.g., `useSomething.ts`)
 - **UI components**: Use shadcn/ui as the base
 
+### Code Quality — Frontend Fundamentals
+
+> Good code = **code that is easy to change**. The 4 criteria below may conflict — when they do, decide by asking "Which option makes this code easier to change?"
+> Source: https://frontend-fundamentals.com/code-quality/code/
+
+#### 1. Readability — Reduce context the reader must hold at once; code should read top-to-bottom
+
+**A. Reduce context**
+- **Separate non-concurrent code paths**: If branches never execute together (e.g., role-based rendering), extract each into its own component instead of mixing with conditionals
+  ```tsx
+  // Bad
+  function SubmitButton() {
+    const isViewer = useRole() === "viewer";
+    useEffect(() => { if (isViewer) return; showButtonAnimation(); }, [isViewer]);
+    return isViewer ? <TextButton disabled>Submit</TextButton> : <Button type="submit">Submit</Button>;
+  }
+  // Good — split into ViewerSubmitButton / AdminSubmitButton
+  ```
+- **Abstract implementation details**: Wrap low-level logic so the reader only sees "what", not "how" (e.g., AuthGuard wrapper, dedicated InviteButton)
+- **Split hooks that mix unrelated concerns**: One hook = one concern (see also Coupling §4)
+
+**B. Name things**
+- **Name complex conditions**: Extract `category.id === targetCategory.id` into `const isSameCategory = ...`
+- **Name magic numbers**: `await delay(300)` → `await delay(ANIMATION_DELAY_MS)` — make intent explicit
+
+**C. Top-to-bottom reading**
+- **Reduce perspective shifts**: Avoid forcing the reader to jump between files/functions to understand one behavior; prefer inline objects or switch statements
+- **Simplify ternaries**: Replace nested ternaries with IIFE + if-return or switch
+  ```tsx
+  // Bad
+  const status = A && B ? "BOTH" : A || B ? (A ? "A" : "B") : "NONE";
+  // Good
+  const status = (() => {
+    if (A && B) return "BOTH";
+    if (A) return "A";
+    if (B) return "B";
+    return "NONE";
+  })();
+  ```
+- **Math-order range checks**: Write `minPrice <= price && price <= maxPrice` instead of `price >= minPrice && price <= maxPrice`
+
+#### 2. Predictability — Behavior should be obvious from name, params, and return type
+
+- **No name collisions with different behavior**: If a wrapper adds auth, name it differently (`http.get` → `httpService.getWithAuth`)
+- **Unify return types for same-kind functions**: All validation functions should return `{ ok: boolean; reason?: string }`, not a mix of booleans and objects
+  ```tsx
+  // Bad — checkIsNameValid returns boolean, checkIsAgeValid returns { ok, reason }
+  // Good — both return { ok: true } | { ok: false; reason: string }
+  ```
+- **No hidden side effects**: If a function's name is `fetchBalance`, it should only fetch — move logging/tracking to the call site so the reader isn't surprised
+
+#### 3. Cohesion — Code that must change together should live together
+
+- **Co-locate by domain, not by type**: Prefer `domains/Payment/{components,hooks,utils}` over top-level `components/`, `hooks/`, `utils/` folders with hundreds of files
+- **Eliminate magic numbers for cohesion**: Beyond naming (see Readability §B), co-locate the constant with the code it depends on so related changes happen together
+- **Choose form cohesion strategy intentionally**:
+  - Field-level (each field validates itself): when fields are independent and reusable
+  - Form-level (Zod schema validates all): when fields have cross-dependencies (password confirm, total calc)
+
+#### 4. Coupling — Minimize the blast radius when code changes
+
+- **Single-responsibility hooks**: One hook = one concern. A catch-all `usePageState()` forces every consumer to re-render on any param change
+- **Allow duplication over premature abstraction**: If pages may diverge in behavior (different logging, different UI text), keep separate implementations instead of a shared hook/component that accumulates `if` branches
+- **Eliminate Props Drilling**: When a middle component passes props it never uses, refactor with Composition (`children`) first; use Context only when composition isn't enough
+  ```tsx
+  // Bad — ItemEditBody receives recommendedItems/onConfirm just to forward them
+  // Good — use children so ItemEditList receives props directly from parent
+  ```
+
 ### TypeScript
 - **No `any` type** - use `unknown` or proper types instead
 - **Reuse types via ComponentProps**: Use `ComponentProps<typeof SomeComponent>` with `Pick`/`Omit` to derive types - avoid duplicating type definitions
@@ -86,8 +155,6 @@ server/src/
     default: return status satisfies never;
   }
   ```
-- **No nested ternaries**: Do not nest ternary operators more than once
-
 ### State Management
 - **Prefer useReducer over multiple useState**: When managing related state values, use `useReducer` instead of multiple `useState` calls
 
