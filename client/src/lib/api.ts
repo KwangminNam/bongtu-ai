@@ -11,6 +11,7 @@ import type {
   UpdateRecord,
   SentRecord,
   CreateSentRecord,
+  UpdateSentRecord,
   OcrExtractResult,
   CreateEventOcr,
   OcrBulkResult,
@@ -49,6 +50,7 @@ export const api = {
   sentRecords: {
     byFriend: (friendId: string) => client.get<SentRecord[]>("/sent-records", { friendId }),
     create: (data: CreateSentRecord) => client.post<SentRecord>("/sent-records", data),
+    update: (id: string, data: UpdateSentRecord) => client.patch<SentRecord>(`/sent-records/${id}`, data),
     delete: (id: string) => client.delete(`/sent-records/${id}`),
   },
 };
@@ -68,6 +70,7 @@ export type {
   UpdateRecord,
   SentRecord,
   CreateSentRecord,
+  UpdateSentRecord,
   OcrRecord,
   OcrExtractResult,
   CreateEventOcr,

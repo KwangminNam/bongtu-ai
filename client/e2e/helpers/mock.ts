@@ -143,7 +143,7 @@ export async function mockEventsApi(page: Page) {
 }
 
 export async function mockFriendsApi(page: Page) {
-  await page.route(`${API_URL}/friends`, async (route) => {
+  await page.route(new RegExp(`${API_URL}/friends(\\?.*)?$`), async (route) => {
     const method = route.request().method();
 
     if (method === "GET") {
@@ -165,6 +165,97 @@ export async function mockFriendsApi(page: Page) {
         contentType: "application/json",
         body: JSON.stringify({ result: newFriend, error: null }),
       });
+    }
+  });
+}
+
+export const MOCK_FRIEND_DETAIL = {
+  id: "friend-1",
+  name: "김철수",
+  relation: "친구",
+  records: [
+    {
+      id: "record-1",
+      amount: 50000,
+      memo: null,
+      event: { title: "나의 결혼식", type: "WEDDING", date: "2025-06-15" },
+    },
+  ],
+  sentRecords: [
+    {
+      id: "sent-1",
+      amount: 30000,
+      date: "2025-07-20",
+      eventType: "BIRTHDAY",
+      memo: "생일 축하",
+      friendId: "friend-1",
+    },
+    {
+      id: "sent-2",
+      amount: 50000,
+      date: "2025-08-10",
+      eventType: "WEDDING",
+      memo: null,
+      friendId: "friend-1",
+    },
+  ],
+};
+
+export async function mockFriendDetailApi(page: Page) {
+  // Match /friends/<id> but not /friends alone
+  await page.route(new RegExp(`${API_URL}/friends/[^/]+$`), async (route) => {
+    const method = route.request().method();
+
+    if (method === "GET") {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ result: MOCK_FRIEND_DETAIL, error: null }),
+      });
+    } else if (method === "PATCH") {
+      const body = route.request().postDataJSON();
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          result: { ...MOCK_FRIEND_DETAIL, ...body },
+          error: null,
+        }),
+      });
+    } else if (method === "DELETE") {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ result: { count: 1 }, error: null }),
+      });
+    } else {
+      await route.fallback();
+    }
+  });
+}
+
+export async function mockSentRecordsApi(page: Page) {
+  await page.route(new RegExp(`${API_URL}/sent-records/[^/]+$`), async (route) => {
+    const method = route.request().method();
+
+    if (method === "PATCH") {
+      const body = route.request().postDataJSON();
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          result: { count: 1, ...body },
+          error: null,
+        }),
+      });
+    } else if (method === "DELETE") {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ result: { count: 1 }, error: null }),
+      });
+    } else {
+      await route.fallback();
     }
   });
 }

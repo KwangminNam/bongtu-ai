@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Delete,
   Param,
   Body,
@@ -13,6 +14,7 @@ import { SentRecordService } from './sent-record.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 import { CreateSentRecordDto } from './dto/create-sent-record.dto.js';
+import { UpdateSentRecordDto } from './dto/update-sent-record.dto.js';
 
 @UseGuards(JwtAuthGuard)
 @Controller('sent-records')
@@ -34,6 +36,15 @@ export class SentRecordController {
     @Body() dto: CreateSentRecordDto,
   ) {
     return this.sentRecordService.create(user.id, dto);
+  }
+
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Body() dto: UpdateSentRecordDto,
+    @CurrentUser() user: { id: string },
+  ) {
+    return this.sentRecordService.update(id, user.id, dto);
   }
 
   @Delete(':id')

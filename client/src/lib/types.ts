@@ -106,6 +106,13 @@ export interface CreateSentRecord {
   friendId: string;
 }
 
+export interface UpdateSentRecord {
+  amount?: number;
+  date?: string;
+  eventType?: string;
+  memo?: string;
+}
+
 // ── OCR Types ──
 export interface OcrRecord {
   name: string;
