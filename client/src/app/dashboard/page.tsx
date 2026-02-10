@@ -30,7 +30,7 @@ async function EventListWrapper() {
 
 export default function DashboardPage() {
   return (
-    <div className="flex flex-col px-5 pt-14 pb-24">
+    <div className="flex flex-col px-5 pt-14 pb-4">
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -51,13 +51,6 @@ export default function DashboardPage() {
         <EventListWrapper />
       </Suspense.CardSkeleton>
 
-      {/* AI 챗 버튼 (플로팅) */}
-      <Link
-        href="/dashboard/chat"
-        className="fixed bottom-20 right-5 w-14 h-14 bg-primary text-primary-foreground rounded-full flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-105 transition-all"
-      >
-        <MessageCircle size={24} />
-      </Link>
     </div>
   );
 }

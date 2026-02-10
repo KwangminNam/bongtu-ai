@@ -115,7 +115,7 @@ export default async function FriendDetailPage({
   const { id } = await params;
 
   return (
-    <div className="flex flex-col px-5 pt-14 pb-4 h-full overflow-y-auto">
+    <div className="flex flex-col px-5 pt-14 pb-4">
       <div className="flex items-center gap-3 mb-6">
         <BackButton />
         <Suspense.Skeleton

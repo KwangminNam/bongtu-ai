@@ -52,10 +52,10 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-muted flex justify-center items-center min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-muted flex justify-center items-center h-dvh overflow-hidden`}
       >
         <Providers>
-          <div className="w-[393px] h-[852px] max-h-dvh bg-background shadow-xl relative overflow-hidden touch-pan-y overscroll-contain">
+          <div className="w-full max-w-[393px] h-[852px] max-h-dvh bg-background shadow-xl relative overflow-hidden touch-pan-y overscroll-contain">
             {children}
           </div>
           <Toaster position="top-center" richColors />

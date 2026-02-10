@@ -28,7 +28,7 @@ export function BottomCTA({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
-      className="fixed bottom-16 left-1/2 -translate-x-1/2 w-[393px] pb-[50px] px-5 flex flex-col justify-end pb-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl z-40"
+      className="shrink-0 w-full px-5 pt-3 pb-4 flex flex-col justify-end bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl z-40"
     >
       {summary}
       <motion.button

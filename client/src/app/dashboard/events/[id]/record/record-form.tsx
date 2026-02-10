@@ -105,33 +105,35 @@ function RecordFormContent({
   };
 
   return (
-    <div className="relative flex flex-col px-5 pt-14 pb-40 h-full overflow-y-auto">
-      {/* 헤더 */}
-      <div className="flex items-center gap-3 mb-6">
-        <BackButton />
-        <div>
-          <h1 className="text-xl font-bold text-foreground">기록 추가</h1>
-          <p className="text-xs text-muted-foreground">경조사 내역을 기록하세요</p>
+    <div className="flex flex-col h-full">
+      <div className="flex-1 min-h-0 overflow-y-auto px-5 pt-14 pb-4">
+        {/* 헤더 */}
+        <div className="flex items-center gap-3 mb-6">
+          <BackButton />
+          <div>
+            <h1 className="text-xl font-bold text-foreground">기록 추가</h1>
+            <p className="text-xs text-muted-foreground">경조사 내역을 기록하세요</p>
+          </div>
         </div>
+
+        {/* 1. 금액 선택 */}
+        <AmountSelection.Card>
+          <AmountSelection.TypeToggle />
+          <AmountSelection.CashSelector />
+          <AmountSelection.GoldSelector />
+        </AmountSelection.Card>
+
+        {/* 2. 새 지인 추가 */}
+        <FriendInput.NewFriendCard />
+
+        {/* 3. 기존 지인 선택 */}
+        <Suspense.Skeleton skeleton={<FriendInput.ExistingFriendsListSkeleton />}>
+          <FriendInput.ExistingFriendsList friendsPromise={friendsPromise} />
+        </Suspense.Skeleton>
+
+        {/* 4. 메모 */}
+        <MemoInput value={memo} onChange={setMemo} />
       </div>
-
-      {/* 1. 금액 선택 */}
-      <AmountSelection.Card>
-        <AmountSelection.TypeToggle />
-        <AmountSelection.CashSelector />
-        <AmountSelection.GoldSelector />
-      </AmountSelection.Card>
-
-      {/* 2. 새 지인 추가 */}
-      <FriendInput.NewFriendCard />
-
-      {/* 3. 기존 지인 선택 */}
-      <Suspense.Skeleton skeleton={<FriendInput.ExistingFriendsListSkeleton />}>
-        <FriendInput.ExistingFriendsList friendsPromise={friendsPromise} />
-      </Suspense.Skeleton>
-
-      {/* 4. 메모 */}
-      <MemoInput value={memo} onChange={setMemo} />
 
       {/* 제출 */}
       <BottomCTA

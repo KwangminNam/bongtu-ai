@@ -186,45 +186,46 @@ export function OcrEventForm() {
   const canSubmit = title && type && date && validRecords.length > 0;
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900">
-      {/* 헤더 */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="sticky top-0 z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800"
-      >
-        <div className="flex items-center gap-3 px-5 py-4">
-          <BackButton />
-          <div className="flex-1">
-            <h1 className="text-lg font-bold">명부 스캔</h1>
-            <p className="text-xs text-muted-foreground">
-              {step === "upload" && "명부 이미지를 업로드하세요"}
-              {step === "review" && "인식된 내용을 확인하세요"}
-              {step === "info" && "이벤트 정보를 입력하세요"}
-            </p>
+    <div className="flex flex-col h-full bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900">
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        {/* 헤더 */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="sticky top-0 z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800"
+        >
+          <div className="flex items-center gap-3 px-5 py-4">
+            <BackButton />
+            <div className="flex-1">
+              <h1 className="text-lg font-bold">명부 스캔</h1>
+              <p className="text-xs text-muted-foreground">
+                {step === "upload" && "명부 이미지를 업로드하세요"}
+                {step === "review" && "인식된 내용을 확인하세요"}
+                {step === "info" && "이벤트 정보를 입력하세요"}
+              </p>
+            </div>
+            <Scan className="text-blue-500" size={24} />
           </div>
-          <Scan className="text-blue-500" size={24} />
-        </div>
 
-        {/* 단계 표시 */}
-        <div className="flex px-5 pb-3 gap-2">
-          {(["upload", "review", "info"] as Step[]).map((s, i) => (
-            <div
-              key={s}
-              className={cn(
-                "flex-1 h-1 rounded-full transition-colors",
-                step === s
-                  ? "bg-blue-500"
-                  : ["review", "info"].indexOf(step) > i
-                  ? "bg-blue-300"
-                  : "bg-slate-200 dark:bg-slate-700"
-              )}
-            />
-          ))}
-        </div>
-      </motion.div>
+          {/* 단계 표시 */}
+          <div className="flex px-5 pb-3 gap-2">
+            {(["upload", "review", "info"] as Step[]).map((s, i) => (
+              <div
+                key={s}
+                className={cn(
+                  "flex-1 h-1 rounded-full transition-colors",
+                  step === s
+                    ? "bg-blue-500"
+                    : ["review", "info"].indexOf(step) > i
+                    ? "bg-blue-300"
+                    : "bg-slate-200 dark:bg-slate-700"
+                )}
+              />
+            ))}
+          </div>
+        </motion.div>
 
-      <div className="flex-1 px-5 py-6">
+        <div className="px-5 py-6">
         <AnimatePresence mode="wait">
           {/* Step 1: 이미지 업로드 */}
           {step === "upload" && (
@@ -482,13 +483,14 @@ export function OcrEventForm() {
             </motion.div>
           )}
         </AnimatePresence>
+        </div>
       </div>
 
       {/* 하단 버튼 */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="sticky bottom-0 px-5 pt-4 pb-6 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800"
+        className="shrink-0 px-5 pt-4 pb-6 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800"
       >
         <div className="flex gap-3">
           {step !== "upload" && (
