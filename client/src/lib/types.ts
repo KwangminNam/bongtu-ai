@@ -16,7 +16,7 @@ export interface Event {
   title: string;
   type: string;
   date: string;
-  records: { amount: number }[];
+  records: { amount: number; giftType: string }[];
 }
 
 export interface EventDetail {
@@ -27,6 +27,7 @@ export interface EventDetail {
   records: {
     id: string;
     amount: number;
+    giftType: string;
     memo: string | null;
     friend: { id: string; name: string; relation: string };
   }[];
@@ -44,7 +45,7 @@ export interface Friend {
   id: string;
   name: string;
   relation: string;
-  records: { amount: number; event: { type: string } }[];
+  records: { amount: number; giftType: string; event: { type: string } }[];
   sentRecords?: { amount: number; eventType: string }[];
 }
 
@@ -55,6 +56,7 @@ export interface FriendDetail {
   records: {
     id: string;
     amount: number;
+    giftType: string;
     memo: string | null;
     event: { title: string; type: string; date: string };
   }[];
@@ -70,6 +72,7 @@ export interface CreateFriend {
 export interface GiftRecord {
   id: string;
   amount: number;
+  giftType?: string;
   memo: string | null;
   friend?: { name: string; relation: string };
   event?: { title: string; type: string; date: string };
@@ -77,6 +80,7 @@ export interface GiftRecord {
 
 export interface CreateRecord {
   amount: number;
+  giftType?: string;
   memo?: string;
   eventId: string;
   friendId?: string;
@@ -85,6 +89,7 @@ export interface CreateRecord {
 
 export interface UpdateRecord {
   amount?: number;
+  giftType?: string;
   memo?: string;
 }
 
@@ -155,6 +160,7 @@ export interface GoldPriceResult {
 
 // ── Form Related Types ──
 export type GiftType = "cash" | "gold";
+export type GoldKarat = "24K" | "18K" | "14K";
 
 export interface NewFriend {
   name: string;

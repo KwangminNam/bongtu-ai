@@ -4,3 +4,4 @@ export { AmountDashboard } from "./amount-dashboard";
 export { BalanceCard } from "./balance-card";
 export { EventEditForm } from "./event-edit-form";
 export { RecordItem } from "./record-item";
+export { GoldEditSelector } from "./gold-edit-selector";

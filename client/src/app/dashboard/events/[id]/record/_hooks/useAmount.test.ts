@@ -10,9 +10,8 @@ describe("useAmount", () => {
       expect(result.current.giftType).toBe("cash");
       expect(result.current.selectedAmount).toBeNull();
       expect(result.current.customAmount).toBe("");
-      expect(result.current.goldDon).toBeNull();
-      expect(result.current.customGoldDon).toBe("");
-      expect(result.current.goldPrice).toBeNull();
+      expect(result.current.goldQuantities).toEqual({ "24K": 0, "18K": 0, "14K": 0 });
+      expect(result.current.totalGoldCount).toBe(0);
       expect(result.current.amount).toBe(0);
     });
   });
@@ -63,69 +62,55 @@ describe("useAmount", () => {
     });
   });
 
-  describe("금 선택", () => {
-    it("giftType을 gold로 변경할 수 있다", () => {
+  describe("금 수량 선택", () => {
+    it("24K 수량을 설정할 수 있다", () => {
       const { result } = renderHook(() => useAmount());
 
       act(() => {
-        result.current.setGiftType("gold");
+        result.current.setGoldQuantity("24K", 2);
       });
 
-      expect(result.current.giftType).toBe("gold");
+      expect(result.current.goldQuantities["24K"]).toBe(2);
+      expect(result.current.totalGoldCount).toBe(2);
     });
 
-    it("금 돈수를 선택하면 goldDon이 설정된다", () => {
+    it("여러 순도의 수량을 동시에 설정할 수 있다", () => {
       const { result } = renderHook(() => useAmount());
 
       act(() => {
-        result.current.selectGoldDon(3);
+        result.current.setGoldQuantity("24K", 1);
+        result.current.setGoldQuantity("18K", 2);
+        result.current.setGoldQuantity("14K", 3);
       });
 
-      expect(result.current.goldDon).toBe(3);
-      expect(result.current.goldDonAmount).toBe(3);
+      expect(result.current.goldQuantities).toEqual({ "24K": 1, "18K": 2, "14K": 3 });
+      expect(result.current.totalGoldCount).toBe(6);
     });
 
-    it("금 돈수를 선택하면 customGoldDon이 초기화된다", () => {
+    it("수량이 0 미만이 되지 않는다", () => {
       const { result } = renderHook(() => useAmount());
 
       act(() => {
-        result.current.setCustomGoldDon("5");
+        result.current.setGoldQuantity("24K", -5);
       });
 
-      expect(result.current.customGoldDon).toBe("5");
-
-      act(() => {
-        result.current.selectGoldDon(3);
-      });
-
-      expect(result.current.goldDon).toBe(3);
-      expect(result.current.customGoldDon).toBe("");
+      expect(result.current.goldQuantities["24K"]).toBe(0);
     });
 
-    it("금 시세가 설정되면 goldAmount가 계산된다", () => {
+    it("goldSummary가 선택된 항목만 표시한다", () => {
       const { result } = renderHook(() => useAmount());
 
       act(() => {
-        result.current.setGiftType("gold");
-        result.current.selectGoldDon(3);
-        result.current.setGoldPrice(500000);
+        result.current.setGoldQuantity("24K", 2);
+        result.current.setGoldQuantity("14K", 1);
       });
 
-      expect(result.current.goldDonAmount).toBe(3);
-      expect(result.current.goldAmount).toBe(1500000); // 3돈 * 50만원
-      expect(result.current.amount).toBe(1500000);
+      expect(result.current.goldSummary).toBe("24K 2개, 14K 1개");
     });
 
-    it("금 시세가 없으면 goldAmount는 0이다", () => {
+    it("아무것도 선택하지 않으면 goldSummary가 빈 문자열이다", () => {
       const { result } = renderHook(() => useAmount());
-
-      act(() => {
-        result.current.setGiftType("gold");
-        result.current.selectGoldDon(3);
-      });
-
-      expect(result.current.goldAmount).toBe(0);
-      expect(result.current.amount).toBe(0);
+      expect(result.current.goldSummary).toBe("");
     });
   });
 
@@ -135,26 +120,24 @@ describe("useAmount", () => {
 
       act(() => {
         result.current.selectAmount(100000);
-        result.current.selectGoldDon(3);
-        result.current.setGoldPrice(500000);
+        result.current.setGoldQuantity("24K", 3);
       });
 
       expect(result.current.giftType).toBe("cash");
       expect(result.current.amount).toBe(100000);
     });
 
-    it("gold 타입일 때 금 금액이 반환된다", () => {
+    it("gold 타입일 때 총 수량이 반환된다", () => {
       const { result } = renderHook(() => useAmount());
 
       act(() => {
-        result.current.selectAmount(100000);
         result.current.setGiftType("gold");
-        result.current.selectGoldDon(3);
-        result.current.setGoldPrice(500000);
+        result.current.setGoldQuantity("24K", 1);
+        result.current.setGoldQuantity("18K", 2);
       });
 
       expect(result.current.giftType).toBe("gold");
-      expect(result.current.amount).toBe(1500000);
+      expect(result.current.amount).toBe(3);
     });
   });
 });

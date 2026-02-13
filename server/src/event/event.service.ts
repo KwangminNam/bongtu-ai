@@ -12,7 +12,7 @@ export class EventService {
     return this.prisma.event.findMany({
       where: { userId },
       include: {
-        records: { select: { amount: true } },
+        records: { select: { amount: true, giftType: true } },
       },
       orderBy: { date: 'desc' },
     });

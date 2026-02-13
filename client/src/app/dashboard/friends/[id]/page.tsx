@@ -85,7 +85,9 @@ async function FriendContent({ id }: { id: string }) {
   }
 
   const records = friend.records ?? [];
-  const receivedTotal = records.reduce((sum, r) => sum + r.amount, 0);
+  const receivedTotal = records
+    .filter((r) => r.giftType !== "gold")
+    .reduce((sum, r) => sum + r.amount, 0);
   const sentRecords = friend.sentRecords ?? [];
   const sentTotal = sentRecords.reduce((sum, r) => sum + r.amount, 0);
 

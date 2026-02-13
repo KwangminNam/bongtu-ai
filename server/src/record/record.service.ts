@@ -38,6 +38,7 @@ export class RecordService {
     return this.prisma.record.createMany({
       data: validIds.map((friendId) => ({
         amount: dto.amount,
+        giftType: dto.giftType ?? 'cash',
         memo: dto.memo,
         eventId: dto.eventId,
         friendId,

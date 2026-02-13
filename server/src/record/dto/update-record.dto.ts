@@ -7,5 +7,9 @@ export class UpdateRecordDto {
 
   @IsOptional()
   @IsString()
+  giftType?: string;
+
+  @IsOptional()
+  @IsString()
   memo?: string;
 }

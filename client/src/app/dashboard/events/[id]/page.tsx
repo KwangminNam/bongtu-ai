@@ -80,7 +80,9 @@ async function EventContent({ id }: { id: string }) {
   }
 
   const records = event.records ?? [];
-  const receivedAmount = records.reduce((sum, r) => sum + r.amount, 0);
+  const receivedAmount = records
+    .filter((r) => r.giftType !== "gold")
+    .reduce((sum, r) => sum + r.amount, 0);
 
   return (
     <>

@@ -127,7 +127,7 @@ export function ChatUI() {
       <div className="flex items-center gap-3 px-5 pt-14 pb-4 border-b">
         <BackButton />
         <div className="flex-1">
-          <h1 className="text-xl font-bold">AI 어시스턴트</h1>
+          <h1 className="text-xl font-bold">AI 비서</h1>
           <p className="text-xs text-muted-foreground">
             경조사 기록을 분석하고 관리해드려요
           </p>

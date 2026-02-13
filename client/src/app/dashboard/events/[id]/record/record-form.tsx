@@ -16,10 +16,11 @@ import {
 
 interface RecordFormProps {
   eventId: string;
+  eventDate: string | null;
   friendsPromise: Promise<Friend[]>;
 }
 
-export function RecordForm({ eventId, friendsPromise }: RecordFormProps) {
+export function RecordForm({ eventId, eventDate, friendsPromise }: RecordFormProps) {
   const router = useRouter();
   const [memo, setMemo] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -29,6 +30,7 @@ export function RecordForm({ eventId, friendsPromise }: RecordFormProps) {
       <FriendInput>
         <RecordFormContent
           eventId={eventId}
+          eventDate={eventDate}
           friendsPromise={friendsPromise}
           memo={memo}
           setMemo={setMemo}
@@ -43,6 +45,7 @@ export function RecordForm({ eventId, friendsPromise }: RecordFormProps) {
 
 interface RecordFormContentProps {
   eventId: string;
+  eventDate: string | null;
   friendsPromise: Promise<Friend[]>;
   memo: string;
   setMemo: (memo: string) => void;
@@ -53,6 +56,7 @@ interface RecordFormContentProps {
 
 function RecordFormContent({
   eventId,
+  eventDate,
   friendsPromise,
   memo,
   setMemo,
@@ -60,7 +64,7 @@ function RecordFormContent({
   setSubmitting,
   router,
 }: RecordFormContentProps) {
-  const { amount, giftType, goldPrice, goldDonAmount } = AmountSelection.useContext();
+  const { amount, giftType, goldSummary } = AmountSelection.useContext();
   const { totalPeople, selectedFriendIds, getAllNewFriends } = FriendInput.useContext();
 
   const handleSubmit = async () => {
@@ -79,13 +83,13 @@ function RecordFormContent({
       const allFriendIds = [...selectedFriendIds, ...createdFriendIds];
 
       let finalMemo = memo;
-      if (giftType === "gold" && goldPrice) {
-        const goldInfo = `금 ${goldDonAmount}돈 (시세 ${goldPrice.toLocaleString()}원/돈 기준)`;
-        finalMemo = memo ? `${goldInfo} - ${memo}` : goldInfo;
+      if (giftType === "gold" && goldSummary) {
+        finalMemo = memo ? `${goldSummary} - ${memo}` : goldSummary;
       }
 
       await api.records.create({
         amount,
+        giftType,
         memo: finalMemo || undefined,
         eventId,
         friendIds: allFriendIds,
@@ -121,6 +125,7 @@ function RecordFormContent({
           <AmountSelection.TypeToggle />
           <AmountSelection.CashSelector />
           <AmountSelection.GoldSelector />
+          <AmountSelection.GoldPriceAI eventDate={eventDate} />
         </AmountSelection.Card>
 
         {/* 2. 새 지인 추가 */}
@@ -141,7 +146,7 @@ function RecordFormContent({
         disabled={amount <= 0 || totalPeople === 0}
         loading={submitting}
         loadingText="등록 중..."
-        summary={<RecordSummary totalPeople={totalPeople} amount={amount} />}
+        summary={<RecordSummary totalPeople={totalPeople} amount={amount} giftType={giftType} />}
       >
         {totalPeople > 0 ? `${totalPeople}명 기록 등록` : "기록 등록"}
       </BottomCTA>

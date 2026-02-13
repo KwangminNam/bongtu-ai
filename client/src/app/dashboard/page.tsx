@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, MessageCircle } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Suspense } from "@/components/ui/suspense";
 import { createFetchClient } from "@/lib/fetch-client";

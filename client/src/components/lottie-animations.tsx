@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Lottie from "lottie-react";
 
 // 빈 상태 애니메이션 (인라인 JSON)
@@ -334,6 +335,49 @@ export function LoadingDots({ size = 60 }: { size?: number }) {
   return (
     <Lottie
       animationData={loadingAnimation}
+      loop
+      style={{ width: size, height: size }}
+    />
+  );
+}
+
+// ── 외부 JSON 로드 Lottie 컴포넌트 ──
+
+function useExternalLottie(path: string) {
+  const [data, setData] = useState<unknown>(null);
+
+  useEffect(() => {
+    fetch(path)
+      .then((res) => res.json())
+      .then(setData)
+      .catch(() => {});
+  }, [path]);
+
+  return data;
+}
+
+export function WelcomeLottie({ size = 200 }: { size?: number }) {
+  const data = useExternalLottie("/lottie/welcome.json");
+
+  if (!data) return <div style={{ width: size, height: size }} />;
+
+  return (
+    <Lottie
+      animationData={data}
+      loop
+      style={{ width: size, height: size }}
+    />
+  );
+}
+
+export function OnboardingLottie({ size = 160 }: { size?: number }) {
+  const data = useExternalLottie("/lottie/onboarding.json");
+
+  if (!data) return <div style={{ width: size, height: size }} />;
+
+  return (
+    <Lottie
+      animationData={data}
       loop
       style={{ width: size, height: size }}
     />

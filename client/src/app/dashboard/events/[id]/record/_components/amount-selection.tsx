@@ -1,12 +1,14 @@
 "use client";
 
 import { type ReactNode } from "react";
-import { Wallet } from "lucide-react";
+import { Wallet, Minus, Plus } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RECEIVED_AMOUNT_BADGES, GOLD_PRESETS } from "@/lib/constants";
+import { RECEIVED_AMOUNT_BADGES, GOLD_KARAT_OPTIONS } from "@/lib/constants";
+import type { GoldKarat } from "@/lib/types";
 import { AmountContext, useAmountContext, useAmount } from "../_hooks";
+import { GoldPriceAI } from "./gold-price-ai";
 
 // ─── Root (Provider only) ───
 interface AmountSelectionProps {
@@ -115,81 +117,62 @@ function CashSelector() {
 
 // ─── GoldSelector ───
 function GoldSelector() {
-  const {
-    giftType,
-    goldDon,
-    customGoldDon,
-    goldPrice,
-    goldAmount,
-    goldDonAmount,
-    selectGoldDon,
-    setCustomGoldDon,
-    setGoldPrice,
-  } = useAmountContext();
+  const { giftType, goldQuantities, setGoldQuantity } = useAmountContext();
 
   if (giftType !== "gold") return null;
 
   return (
-    <>
-      <div className="grid grid-cols-5 gap-2 mb-3">
-        {GOLD_PRESETS.map((preset) => (
-          <button
-            key={preset.don}
-            type="button"
-            className={`py-3 px-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
-              goldDon === preset.don
-                ? "bg-amber-500 text-white shadow-md"
-                : "bg-secondary text-secondary-foreground hover:bg-amber-100"
-            }`}
-            onClick={() => selectGoldDon(preset.don)}
-          >
-            {preset.label}
-          </button>
-        ))}
-      </div>
-
-      <div className="relative mb-3">
-        <Input
-          placeholder="직접 입력 (돈)"
-          type="number"
-          step="0.1"
-          value={customGoldDon}
-          onChange={(e) => setCustomGoldDon(e.target.value)}
-          className="pr-10 h-11 rounded-xl"
+    <div className="space-y-2">
+      {GOLD_KARAT_OPTIONS.map((option) => (
+        <GoldKaratRow
+          key={option.value}
+          karat={option.value}
+          label={option.label}
+          description={option.description}
+          quantity={goldQuantities[option.value]}
+          onChange={(qty) => setGoldQuantity(option.value, qty)}
         />
-        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-          돈
-        </span>
-      </div>
+      ))}
+    </div>
+  );
+}
 
-      <div className="relative">
-        <Input
-          placeholder="1돈당 시세 입력"
-          type="number"
-          value={goldPrice ?? ""}
-          onChange={(e) =>
-            setGoldPrice(e.target.value ? Number(e.target.value) : null)
-          }
-          className="pr-16 h-11 rounded-xl"
-        />
-        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-          원/돈
-        </span>
-      </div>
+interface GoldKaratRowProps {
+  karat: GoldKarat;
+  label: string;
+  description: string;
+  quantity: number;
+  onChange: (quantity: number) => void;
+}
 
-      {goldPrice && goldDonAmount > 0 && (
-        <div className="mt-3 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-amber-700 dark:text-amber-300">
-              {goldDonAmount}돈 × {goldPrice.toLocaleString()}원
-            </span>
-            <span className="text-lg font-bold text-amber-600 dark:text-amber-400">
-              ≈ {goldAmount.toLocaleString()}원
-            </span>
-          </div>
-        </div>
-      )}
-    </>
+function GoldKaratRow({ label, description, quantity, onChange }: GoldKaratRowProps) {
+  return (
+    <div className="flex items-center justify-between p-3 rounded-xl bg-secondary/50">
+      <div>
+        <span className="text-sm font-semibold">{label}</span>
+        <span className="ml-1.5 text-xs text-muted-foreground">{description}</span>
+      </div>
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => onChange(quantity - 1)}
+          disabled={quantity <= 0}
+          className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center text-amber-700 dark:text-amber-300 disabled:opacity-30 transition-opacity"
+        >
+          <Minus size={14} />
+        </button>
+        <span className="w-6 text-center text-sm font-bold tabular-nums">
+          {quantity}
+        </span>
+        <button
+          type="button"
+          onClick={() => onChange(quantity + 1)}
+          className="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center text-white"
+        >
+          <Plus size={14} />
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -199,5 +182,6 @@ export const AmountSelection = Object.assign(AmountSelectionRoot, {
   TypeToggle,
   CashSelector,
   GoldSelector,
+  GoldPriceAI,
   useContext: useAmountContext,
 });

@@ -52,7 +52,8 @@ model Friend {
 
 model Record {
   id       String  @id @default(uuid())
-  amount   Int     // 금액 (원 단위)
+  amount   Int     // 금액 (원 단위) 또는 금 개수
+  giftType String  @default("cash") // "cash" | "gold"
   memo     String?
   friendId String
   friend   Friend  @relation(fields: [friendId], references: [id], onDelete: Cascade)

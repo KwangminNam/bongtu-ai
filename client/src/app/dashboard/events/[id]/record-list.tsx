@@ -8,6 +8,7 @@ interface RecordListProps {
   records: {
     id: string;
     amount: number;
+    giftType: string;
     memo: string | null;
     friend: { id: string; name: string; relation: string };
   }[];

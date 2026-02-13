@@ -47,10 +47,9 @@ export function FriendCards({
     <div className="flex flex-col gap-3">
       {filtered.map((friend) => {
         const records = friend.records ?? [];
-        const totalAmount = records.reduce(
-          (sum, r) => sum + r.amount,
-          0
-        );
+        const totalAmount = records
+          .filter((r) => r.giftType !== "gold")
+          .reduce((sum, r) => sum + r.amount, 0);
         const hasSentRecords = friend.sentRecords && friend.sentRecords.length > 0;
         return (
           <Link key={friend.id} href={`/dashboard/friends/${friend.id}`}>

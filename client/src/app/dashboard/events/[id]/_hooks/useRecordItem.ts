@@ -5,21 +5,68 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { revalidateEventDetail, revalidateDashboard } from "@/lib/actions";
+import type { GoldKarat } from "@/lib/types";
+
+// ─── Gold Memo Utils ───
+type GoldQuantities = Record<GoldKarat, number>;
+
+const INITIAL_GOLD_QUANTITIES: GoldQuantities = { "24K": 0, "18K": 0, "14K": 0 };
+const KARATS: GoldKarat[] = ["24K", "18K", "14K"];
+
+export function parseGoldMemo(memo: string | null): {
+  goldQuantities: GoldQuantities;
+  userMemo: string;
+} {
+  if (!memo) return { goldQuantities: INITIAL_GOLD_QUANTITIES, userMemo: "" };
+
+  const [goldPart, ...rest] = memo.split(" - ");
+  const userMemo = rest.join(" - ").trim();
+
+  const quantities: GoldQuantities = { ...INITIAL_GOLD_QUANTITIES };
+  for (const karat of KARATS) {
+    const match = goldPart.match(new RegExp(`${karat}\\s+(\\d+)개`));
+    if (match) {
+      quantities[karat] = Number(match[1]);
+    }
+  }
+
+  const hasAnyGold = KARATS.some((k) => quantities[k] > 0);
+  if (!hasAnyGold) return { goldQuantities: INITIAL_GOLD_QUANTITIES, userMemo: memo };
+
+  return { goldQuantities: quantities, userMemo };
+}
+
+export function buildGoldMemo(goldQuantities: GoldQuantities, userMemo: string): string {
+  const parts: string[] = [];
+  for (const k of KARATS) {
+    if (goldQuantities[k] > 0) {
+      parts.push(`${k} ${goldQuantities[k]}개`);
+    }
+  }
+  const goldSummary = parts.join(", ");
+  if (!goldSummary) return userMemo;
+  return userMemo ? `${goldSummary} - ${userMemo}` : goldSummary;
+}
 
 // ─── State & Actions ───
 interface RecordItemState {
   isEditing: boolean;
   amount: string;
   memo: string;
+  goldQuantities: GoldQuantities;
   isDeleting: boolean;
   isSaving: boolean;
 }
 
 type RecordItemAction =
   | { type: "START_EDITING" }
-  | { type: "CANCEL_EDITING"; payload: { amount: string; memo: string } }
+  | {
+      type: "CANCEL_EDITING";
+      payload: { amount: string; memo: string; goldQuantities: GoldQuantities };
+    }
   | { type: "SET_AMOUNT"; payload: string }
   | { type: "SET_MEMO"; payload: string }
+  | { type: "SET_GOLD_QUANTITY"; payload: { karat: GoldKarat; quantity: number } }
   | { type: "SET_DELETING"; payload: boolean }
   | { type: "SET_SAVING"; payload: boolean }
   | { type: "SAVE_SUCCESS" };
@@ -37,11 +84,20 @@ const recordItemReducer = (
         isEditing: false,
         amount: action.payload.amount,
         memo: action.payload.memo,
+        goldQuantities: action.payload.goldQuantities,
       };
     case "SET_AMOUNT":
       return { ...state, amount: action.payload };
     case "SET_MEMO":
       return { ...state, memo: action.payload };
+    case "SET_GOLD_QUANTITY":
+      return {
+        ...state,
+        goldQuantities: {
+          ...state.goldQuantities,
+          [action.payload.karat]: Math.max(0, action.payload.quantity),
+        },
+      };
     case "SET_DELETING":
       return { ...state, isDeleting: action.payload };
     case "SET_SAVING":
@@ -59,6 +115,7 @@ interface UseRecordItemParams {
   initialAmount: number;
   initialMemo: string | null;
   friendName: string;
+  giftType: string;
 }
 
 export const useRecordItem = ({
@@ -67,13 +124,20 @@ export const useRecordItem = ({
   initialAmount,
   initialMemo,
   friendName,
+  giftType,
 }: UseRecordItemParams) => {
   const router = useRouter();
+  const isGold = giftType === "gold";
+
+  const { goldQuantities: initialGoldQuantities, userMemo: initialUserMemo } = isGold
+    ? parseGoldMemo(initialMemo)
+    : { goldQuantities: INITIAL_GOLD_QUANTITIES, userMemo: initialMemo || "" };
 
   const [state, dispatch] = useReducer(recordItemReducer, {
     isEditing: false,
     amount: initialAmount.toString(),
-    memo: initialMemo || "",
+    memo: isGold ? initialUserMemo : initialMemo || "",
+    goldQuantities: initialGoldQuantities,
     isDeleting: false,
     isSaving: false,
   });
@@ -87,10 +151,11 @@ export const useRecordItem = ({
       type: "CANCEL_EDITING",
       payload: {
         amount: initialAmount.toString(),
-        memo: initialMemo || "",
+        memo: isGold ? initialUserMemo : initialMemo || "",
+        goldQuantities: initialGoldQuantities,
       },
     });
-  }, [initialAmount, initialMemo]);
+  }, [initialAmount, initialMemo, initialGoldQuantities, initialUserMemo, isGold]);
 
   const setAmount = useCallback((value: string) => {
     dispatch({ type: "SET_AMOUNT", payload: value });
@@ -100,13 +165,27 @@ export const useRecordItem = ({
     dispatch({ type: "SET_MEMO", payload: value });
   }, []);
 
+  const setGoldQuantity = useCallback((karat: GoldKarat, quantity: number) => {
+    dispatch({ type: "SET_GOLD_QUANTITY", payload: { karat, quantity } });
+  }, []);
+
+  const totalGoldCount =
+    state.goldQuantities["24K"] +
+    state.goldQuantities["18K"] +
+    state.goldQuantities["14K"];
+
   const handleSave = useCallback(async () => {
     dispatch({ type: "SET_SAVING", payload: true });
 
     try {
+      const saveAmount = isGold ? totalGoldCount : Number(state.amount);
+      const saveMemo = isGold
+        ? buildGoldMemo(state.goldQuantities, state.memo) || undefined
+        : state.memo || undefined;
+
       await api.records.update(recordId, {
-        amount: Number(state.amount),
-        memo: state.memo || undefined,
+        amount: saveAmount,
+        memo: saveMemo,
       });
       await Promise.all([revalidateEventDetail(eventId), revalidateDashboard()]);
       dispatch({ type: "SAVE_SUCCESS" });
@@ -116,7 +195,7 @@ export const useRecordItem = ({
       toast.error("수정에 실패했습니다");
       dispatch({ type: "SET_SAVING", payload: false });
     }
-  }, [recordId, eventId, state.amount, state.memo, router]);
+  }, [recordId, eventId, state.amount, state.memo, state.goldQuantities, isGold, totalGoldCount, router]);
 
   const handleDelete = useCallback(async () => {
     dispatch({ type: "SET_DELETING", payload: true });
@@ -134,10 +213,12 @@ export const useRecordItem = ({
 
   return {
     ...state,
+    totalGoldCount,
     startEditing,
     cancelEditing,
     setAmount,
     setMemo,
+    setGoldQuantity,
     handleSave,
     handleDelete,
   };

@@ -61,12 +61,10 @@ export const SENT_AMOUNT_BADGES = [
 ] as const;
 
 // ── Gold Presets ──
-export const GOLD_PRESETS = [
-  { don: 1, label: "1돈" },
-  { don: 2, label: "2돈" },
-  { don: 3, label: "3돈" },
-  { don: 5, label: "5돈" },
-  { don: 10, label: "10돈" },
+export const GOLD_KARAT_OPTIONS = [
+  { value: "24K", label: "24K", description: "순금" },
+  { value: "18K", label: "18K", description: "75%" },
+  { value: "14K", label: "14K", description: "58.5%" },
 ] as const;
 
 // ── Relation Suggestions ──

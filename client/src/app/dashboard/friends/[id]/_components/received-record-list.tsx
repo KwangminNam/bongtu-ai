@@ -1,10 +1,12 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EVENT_TYPE_LABELS } from "@/lib/constants";
+import { formatAmount } from "@/lib/utils";
 
 interface ReceivedRecord {
   id: string;
   amount: number;
+  giftType: string;
   memo: string | null;
   event: { title: string; type: string; date: string };
 }
@@ -41,7 +43,7 @@ export function ReceivedRecordList({ records }: ReceivedRecordListProps) {
               </div>
             </div>
             <div className="font-semibold text-sm text-blue-600">
-              +{record.amount.toLocaleString()}원
+              +{formatAmount(record.amount, record.giftType)}
             </div>
           </div>
         </Card>

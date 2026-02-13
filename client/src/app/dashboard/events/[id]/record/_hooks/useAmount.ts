@@ -1,33 +1,35 @@
 "use client";
 
 import { useReducer, useCallback, useMemo, createContext, useContext } from "react";
-import type { GiftType } from "@/lib/types";
+import type { GiftType, GoldKarat } from "@/lib/types";
 
 // ─── State & Actions ───
+type GoldQuantities = Record<GoldKarat, number>;
+
 interface AmountState {
   giftType: GiftType;
   selectedAmount: number | null;
   customAmount: string;
-  goldDon: number | null;
-  customGoldDon: string;
-  goldPrice: number | null;
+  goldQuantities: GoldQuantities;
 }
 
 type AmountAction =
   | { type: "SET_GIFT_TYPE"; payload: GiftType }
   | { type: "SELECT_AMOUNT"; payload: number }
   | { type: "SET_CUSTOM_AMOUNT"; payload: string }
-  | { type: "SELECT_GOLD_DON"; payload: number }
-  | { type: "SET_CUSTOM_GOLD_DON"; payload: string }
-  | { type: "SET_GOLD_PRICE"; payload: number | null };
+  | { type: "SET_GOLD_QUANTITY"; payload: { karat: GoldKarat; quantity: number } };
+
+const INITIAL_GOLD_QUANTITIES: GoldQuantities = {
+  "24K": 0,
+  "18K": 0,
+  "14K": 0,
+};
 
 const initialState: AmountState = {
   giftType: "cash",
   selectedAmount: null,
   customAmount: "",
-  goldDon: null,
-  customGoldDon: "",
-  goldPrice: null,
+  goldQuantities: INITIAL_GOLD_QUANTITIES,
 };
 
 const amountReducer = (state: AmountState, action: AmountAction): AmountState => {
@@ -38,12 +40,14 @@ const amountReducer = (state: AmountState, action: AmountAction): AmountState =>
       return { ...state, selectedAmount: action.payload, customAmount: "" };
     case "SET_CUSTOM_AMOUNT":
       return { ...state, customAmount: action.payload, selectedAmount: null };
-    case "SELECT_GOLD_DON":
-      return { ...state, goldDon: action.payload, customGoldDon: "" };
-    case "SET_CUSTOM_GOLD_DON":
-      return { ...state, customGoldDon: action.payload, goldDon: null };
-    case "SET_GOLD_PRICE":
-      return { ...state, goldPrice: action.payload };
+    case "SET_GOLD_QUANTITY":
+      return {
+        ...state,
+        goldQuantities: {
+          ...state.goldQuantities,
+          [action.payload.karat]: Math.max(0, action.payload.quantity),
+        },
+      };
     default:
       return action satisfies never;
   }
@@ -57,14 +61,10 @@ interface AmountContextValue {
   customAmount: string;
   selectAmount: (value: number) => void;
   setCustomAmount: (value: string) => void;
-  goldDon: number | null;
-  customGoldDon: string;
-  goldPrice: number | null;
-  goldDonAmount: number;
-  goldAmount: number;
-  selectGoldDon: (don: number) => void;
-  setCustomGoldDon: (value: string) => void;
-  setGoldPrice: (price: number | null) => void;
+  goldQuantities: GoldQuantities;
+  totalGoldCount: number;
+  goldSummary: string;
+  setGoldQuantity: (karat: GoldKarat, quantity: number) => void;
   amount: number;
 }
 
@@ -93,32 +93,33 @@ export const useAmount = () => {
     dispatch({ type: "SET_CUSTOM_AMOUNT", payload: value });
   }, []);
 
-  const selectGoldDon = useCallback((don: number) => {
-    dispatch({ type: "SELECT_GOLD_DON", payload: don });
-  }, []);
-
-  const setCustomGoldDon = useCallback((value: string) => {
-    dispatch({ type: "SET_CUSTOM_GOLD_DON", payload: value });
-  }, []);
-
-  const setGoldPrice = useCallback((price: number | null) => {
-    dispatch({ type: "SET_GOLD_PRICE", payload: price });
+  const setGoldQuantity = useCallback((karat: GoldKarat, quantity: number) => {
+    dispatch({ type: "SET_GOLD_QUANTITY", payload: { karat, quantity } });
   }, []);
 
   const cashAmount =
     state.selectedAmount ?? (state.customAmount ? Number(state.customAmount) : 0);
 
-  const goldDonAmount = useMemo(
-    () => (state.goldDon !== null ? state.goldDon : Number(state.customGoldDon) || 0),
-    [state.goldDon, state.customGoldDon]
+  const totalGoldCount = useMemo(
+    () =>
+      state.goldQuantities["24K"] +
+      state.goldQuantities["18K"] +
+      state.goldQuantities["14K"],
+    [state.goldQuantities]
   );
 
-  const goldAmount = useMemo(
-    () => (state.goldPrice ? Math.round(goldDonAmount * state.goldPrice) : 0),
-    [goldDonAmount, state.goldPrice]
-  );
+  const goldSummary = useMemo(() => {
+    const parts: string[] = [];
+    const karats: GoldKarat[] = ["24K", "18K", "14K"];
+    for (const k of karats) {
+      if (state.goldQuantities[k] > 0) {
+        parts.push(`${k} ${state.goldQuantities[k]}개`);
+      }
+    }
+    return parts.join(", ");
+  }, [state.goldQuantities]);
 
-  const amount = state.giftType === "cash" ? cashAmount : goldAmount;
+  const amount = state.giftType === "cash" ? cashAmount : totalGoldCount;
 
   return {
     giftType: state.giftType,
@@ -127,14 +128,10 @@ export const useAmount = () => {
     customAmount: state.customAmount,
     selectAmount,
     setCustomAmount,
-    goldDon: state.goldDon,
-    customGoldDon: state.customGoldDon,
-    goldPrice: state.goldPrice,
-    goldDonAmount,
-    goldAmount,
-    selectGoldDon,
-    setCustomGoldDon,
-    setGoldPrice,
+    goldQuantities: state.goldQuantities,
+    totalGoldCount,
+    goldSummary,
+    setGoldQuantity,
     amount,
   };
 };

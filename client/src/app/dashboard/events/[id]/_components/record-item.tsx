@@ -16,11 +16,14 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useRecordItem } from "../_hooks/useRecordItem";
+import { GoldEditSelector } from "./gold-edit-selector";
+import { formatAmount } from "@/lib/utils";
 
 interface RecordItemProps {
   record: {
     id: string;
     amount: number;
+    giftType: string;
     memo: string | null;
     friend: { id: string; name: string; relation: string };
   };
@@ -28,16 +31,21 @@ interface RecordItemProps {
 }
 
 export function RecordItem({ record, eventId }: RecordItemProps) {
+  const isGold = record.giftType === "gold";
+
   const {
     isEditing,
     amount,
     memo,
+    goldQuantities,
+    totalGoldCount,
     isDeleting,
     isSaving,
     startEditing,
     cancelEditing,
     setAmount,
     setMemo,
+    setGoldQuantity,
     handleSave,
     handleDelete,
   } = useRecordItem({
@@ -46,6 +54,7 @@ export function RecordItem({ record, eventId }: RecordItemProps) {
     initialAmount: record.amount,
     initialMemo: record.memo,
     friendName: record.friend.name,
+    giftType: record.giftType,
   });
 
   // 수정 모드
@@ -87,8 +96,8 @@ export function RecordItem({ record, eventId }: RecordItemProps) {
                     <motion.button
                       whileTap={{ scale: 0.9 }}
                       onClick={handleSave}
-                      disabled={!amount}
-                      className="p-2 rounded-full hover:bg-white/50 transition-colors text-blue-600"
+                      disabled={isGold ? totalGoldCount === 0 : !amount}
+                      className="p-2 rounded-full hover:bg-white/50 transition-colors text-blue-600 disabled:opacity-30"
                     >
                       <Check size={16} />
                     </motion.button>
@@ -96,23 +105,40 @@ export function RecordItem({ record, eventId }: RecordItemProps) {
                 )}
               </div>
             </div>
-            <div className="flex gap-2">
-              <Input
-                type="number"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="금액"
-                className="flex-1 h-10 rounded-xl bg-white/70 dark:bg-slate-900/50"
-                disabled={isSaving}
-              />
-              <Input
-                value={memo}
-                onChange={(e) => setMemo(e.target.value)}
-                placeholder="메모 (선택)"
-                className="flex-1 h-10 rounded-xl bg-white/70 dark:bg-slate-900/50"
-                disabled={isSaving}
-              />
-            </div>
+            {isGold ? (
+              <div className="space-y-2">
+                <GoldEditSelector
+                  goldQuantities={goldQuantities}
+                  onQuantityChange={setGoldQuantity}
+                  disabled={isSaving}
+                />
+                <Input
+                  value={memo}
+                  onChange={(e) => setMemo(e.target.value)}
+                  placeholder="메모 (선택)"
+                  className="h-10 rounded-xl bg-white/70 dark:bg-slate-900/50"
+                  disabled={isSaving}
+                />
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <Input
+                  type="number"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="금액"
+                  className="flex-1 h-10 rounded-xl bg-white/70 dark:bg-slate-900/50"
+                  disabled={isSaving}
+                />
+                <Input
+                  value={memo}
+                  onChange={(e) => setMemo(e.target.value)}
+                  placeholder="메모 (선택)"
+                  className="flex-1 h-10 rounded-xl bg-white/70 dark:bg-slate-900/50"
+                  disabled={isSaving}
+                />
+              </div>
+            )}
           </div>
         </Card>
       </motion.div>
@@ -165,8 +191,7 @@ export function RecordItem({ record, eventId }: RecordItemProps) {
           </div>
           <div className="flex items-center gap-2">
             <div className="font-bold text-sm">
-              {record.amount.toLocaleString()}
-              <span className="text-xs font-normal ml-0.5">원</span>
+              {formatAmount(record.amount, record.giftType)}
             </div>
             <div className="flex gap-0.5">
               <motion.button
@@ -189,7 +214,7 @@ export function RecordItem({ record, eventId }: RecordItemProps) {
                   <AlertDialogHeader>
                     <AlertDialogTitle>내역 삭제</AlertDialogTitle>
                     <AlertDialogDescription>
-                      {record.friend.name}님의 {record.amount.toLocaleString()}원 내역을
+                      {record.friend.name}님의 {formatAmount(record.amount, record.giftType)} 내역을
                       삭제하시겠습니까?
                     </AlertDialogDescription>
                   </AlertDialogHeader>

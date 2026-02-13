@@ -12,7 +12,7 @@ export class FriendService {
       where: { userId },
       include: {
         records: {
-          select: { amount: true, event: { select: { type: true } } },
+          select: { amount: true, giftType: true, event: { select: { type: true } } },
         },
         sentRecords: {
           select: { amount: true, eventType: true, date: true, memo: true },

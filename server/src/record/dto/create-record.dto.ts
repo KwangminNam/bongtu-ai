@@ -6,6 +6,10 @@ export class CreateRecordDto {
 
   @IsOptional()
   @IsString()
+  giftType?: string;
+
+  @IsOptional()
+  @IsString()
   memo?: string;
 
   @IsString()

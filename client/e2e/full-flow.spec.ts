@@ -3,16 +3,20 @@ import { mockAuth, mockEventsApi, mockFriendsApi } from "./helpers/mock";
 
 test.describe("전체 플로우: 로그인 > 이벤트 등록 > 지인 등록", () => {
   test("로그인 페이지에서 대시보드까지 네비게이션", async ({ page }) => {
-    // 1. 로그인 페이지 확인
+    // 1. Welcome 단계 확인
     await page.goto("/");
+    await expect(page.getByRole("button", { name: /로그인하고 시작하기/ })).toBeVisible();
+
+    // 2. CTA 클릭 → 로그인 단계 전환
+    await page.getByRole("button", { name: /로그인하고 시작하기/ }).click();
     await expect(page.getByRole("button", { name: /카카오로 시작하기/ })).toBeVisible();
 
-    // 2. 인증 mock 설정 후 대시보드로 이동
+    // 3. 인증 mock 설정 후 대시보드로 이동
     await mockAuth(page);
     await mockEventsApi(page);
     await page.goto("/dashboard");
 
-    // 3. 대시보드가 정상적으로 로드됨
+    // 4. 대시보드가 정상적으로 로드됨
     await expect(page.getByRole("heading", { name: "경조사 내역" })).toBeVisible();
     await expect(page.getByText("이벤트 목록")).toBeVisible();
   });

@@ -73,6 +73,22 @@ export const listVariants: Variants = {
   },
 };
 
+// ── Intro Page Variants (AnimatePresence step transitions) ──
+export const introPageVariants: Variants = {
+  initial: { opacity: 0, x: -10 },
+  animate: { opacity: 1, x: 0, transition: { duration: 0.3 } },
+  exit: { opacity: 0, x: 10, transition: { duration: 0.2 } },
+};
+
+// ── Intro Stagger Variants ──
+export const introStaggerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.15, delayChildren: 0.2 },
+  },
+};
+
 // ── List Item Variants ──
 export const listItemVariants: Variants = {
   hidden: { opacity: 0, x: -20 },
