@@ -5,6 +5,7 @@ import { signIn } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { WelcomeLottie } from "@/components/lottie-animations";
+import { LogScreen, LogClick } from "@/lib/logging";
 import {
   introPageVariants,
   introStaggerVariants,
@@ -27,20 +28,22 @@ export default function LoginPage() {
   const [step, dispatch] = useReducer(stepReducer, "welcome");
 
   return (
-    <div className="flex flex-col h-full px-8">
-      <AnimatePresence mode="wait">
-        {(() => {
-          switch (step) {
-            case "welcome":
-              return <WelcomeStep onStart={() => dispatch({ type: "GO_LOGIN" })} />;
-            case "login":
-              return <LoginStep />;
-            default:
-              return step satisfies never;
-          }
-        })()}
-      </AnimatePresence>
-    </div>
+    <LogScreen>
+      <div className="flex flex-col h-full px-8">
+        <AnimatePresence mode="wait">
+          {(() => {
+            switch (step) {
+              case "welcome":
+                return <WelcomeStep onStart={() => dispatch({ type: "GO_LOGIN" })} />;
+              case "login":
+                return <LoginStep />;
+              default:
+                return step satisfies never;
+            }
+          })()}
+        </AnimatePresence>
+      </div>
+    </LogScreen>
   );
 }
 
@@ -79,12 +82,14 @@ function WelcomeStep({ onStart }: { onStart: () => void }) {
         transition={{ delay: 0.4, duration: 0.5 }}
         className="pb-12"
       >
-        <Button
-          className="w-full h-12 text-base font-medium"
-          onClick={onStart}
-        >
-          로그인하고 시작하기
-        </Button>
+        <LogClick eventName="start_login">
+          <Button
+            className="w-full h-12 text-base font-medium"
+            onClick={onStart}
+          >
+            로그인하고 시작하기
+          </Button>
+        </LogClick>
       </motion.div>
     </motion.div>
   );
@@ -121,13 +126,15 @@ function LoginStep() {
         className="flex flex-col gap-3 pb-12"
       >
         <motion.div variants={itemVariants}>
-          <Button
-            className="w-full h-12 text-base font-medium bg-[#FEE500] text-[#191919] hover:bg-[#FDD800]"
-            onClick={() => signIn("kakao", { callbackUrl: "/welcome" })}
-          >
-            <KakaoIcon />
-            카카오로 시작하기
-          </Button>
+          <LogClick eventName="login_kakao">
+            <Button
+              className="w-full h-12 text-base font-medium bg-[#FEE500] text-[#191919] hover:bg-[#FDD800]"
+              onClick={() => signIn("kakao", { callbackUrl: "/welcome" })}
+            >
+              <KakaoIcon />
+              카카오로 시작하기
+            </Button>
+          </LogClick>
         </motion.div>
         <motion.p
           variants={itemVariants}

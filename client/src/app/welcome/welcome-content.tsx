@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { OnboardingLottie } from "@/components/lottie-animations";
+import { LogScreen } from "@/lib/logging";
 import { itemVariants } from "@/lib/animations";
 
 const AUTO_REDIRECT_MS = 2000;
@@ -17,11 +18,11 @@ export function WelcomeContent({ hasEvents }: { hasEvents: boolean }) {
     return () => clearTimeout(timer);
   }, [hasEvents, router]);
 
-  if (hasEvents) {
-    return <ReturningUserView />;
-  }
-
-  return <NewUserView />;
+  return (
+    <LogScreen params={{ hasEvents }}>
+      {hasEvents ? <ReturningUserView /> : <NewUserView />}
+    </LogScreen>
+  );
 }
 
 function ReturningUserView() {

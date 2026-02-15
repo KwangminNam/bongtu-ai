@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { EVENT_TYPES } from "@/lib/constants";
+import { LogClick } from "@/lib/logging";
 
 interface EventTypeSelectorProps {
   value: string;
@@ -28,8 +29,8 @@ export function EventTypeSelector({ value, onChange }: EventTypeSelectorProps) {
       </div>
       <div className="grid grid-cols-2 gap-3">
         {EVENT_TYPES.map((eventType, index) => (
+          <LogClick key={eventType.value} eventName="select_event_type" params={{ type: eventType.value }}>
           <motion.button
-            key={eventType.value}
             type="button"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -59,6 +60,7 @@ export function EventTypeSelector({ value, onChange }: EventTypeSelectorProps) {
               </span>
             </div>
           </motion.button>
+          </LogClick>
         ))}
       </div>
     </div>

@@ -18,6 +18,7 @@ import {
 import { useRecordItem } from "../_hooks/useRecordItem";
 import { GoldEditSelector } from "./gold-edit-selector";
 import { formatAmount } from "@/lib/utils";
+import { LogClick } from "@/lib/logging";
 
 interface RecordItemProps {
   record: {
@@ -220,12 +221,14 @@ export function RecordItem({ record, eventId }: RecordItemProps) {
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel className="rounded-xl">취소</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={handleDelete}
-                      className="rounded-xl bg-red-500 hover:bg-red-600"
-                    >
-                      삭제
-                    </AlertDialogAction>
+                    <LogClick eventName="delete_record">
+                      <AlertDialogAction
+                        onClick={handleDelete}
+                        className="rounded-xl bg-red-500 hover:bg-red-600"
+                      >
+                        삭제
+                      </AlertDialogAction>
+                    </LogClick>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>

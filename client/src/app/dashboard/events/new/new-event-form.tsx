@@ -12,6 +12,7 @@ import { BottomCTA } from "@/components/bottom-cta";
 import { api } from "@/lib/api";
 import { revalidateDashboard } from "@/lib/actions";
 import { containerVariants, itemVariants } from "@/lib/animations";
+import { LogScreen, LogClick } from "@/lib/logging";
 import { EventTypeSelector, OcrBanner, EventPreviewCard } from "./_components";
 
 // ─── State & Actions ───
@@ -88,6 +89,7 @@ export function NewEventForm() {
   const isValid = state.title && state.type && state.date;
 
   return (
+    <LogScreen>
     <div className="flex flex-col h-full bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900">
       <div className="flex-1 min-h-0 overflow-y-auto">
         {/* 헤더 */}
@@ -191,15 +193,18 @@ export function NewEventForm() {
       </div>
 
       {/* 하단 버튼 */}
-      <BottomCTA
-        onClick={handleSubmit}
-        disabled={!isValid}
-        loading={state.submitting}
-        loadingText="등록 중..."
-      >
-        <span>이벤트 등록하기</span>
-        <ArrowRight size={18} />
-      </BottomCTA>
+      <LogClick eventName="submit_event">
+        <BottomCTA
+          onClick={handleSubmit}
+          disabled={!isValid}
+          loading={state.submitting}
+          loadingText="등록 중..."
+        >
+          <span>이벤트 등록하기</span>
+          <ArrowRight size={18} />
+        </BottomCTA>
+      </LogClick>
     </div>
+    </LogScreen>
   );
 }

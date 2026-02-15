@@ -7,6 +7,7 @@ import { BackButton } from "@/components/back-button";
 import { BottomCTA } from "@/components/bottom-cta";
 import { api, type Friend } from "@/lib/api";
 import { revalidateEventDetail, revalidateFriends } from "@/lib/actions";
+import { LogScreen, LogClick } from "@/lib/logging";
 import {
   AmountSelection,
   FriendInput,
@@ -26,6 +27,7 @@ export function RecordForm({ eventId, eventDate, friendsPromise }: RecordFormPro
   const [submitting, setSubmitting] = useState(false);
 
   return (
+    <LogScreen params={{ eventId }}>
     <AmountSelection>
       <FriendInput>
         <RecordFormContent
@@ -40,6 +42,7 @@ export function RecordForm({ eventId, eventDate, friendsPromise }: RecordFormPro
         />
       </FriendInput>
     </AmountSelection>
+    </LogScreen>
   );
 }
 
@@ -141,15 +144,17 @@ function RecordFormContent({
       </div>
 
       {/* 제출 */}
-      <BottomCTA
-        onClick={handleSubmit}
-        disabled={amount <= 0 || totalPeople === 0}
-        loading={submitting}
-        loadingText="등록 중..."
-        summary={<RecordSummary totalPeople={totalPeople} amount={amount} giftType={giftType} />}
-      >
-        {totalPeople > 0 ? `${totalPeople}명 기록 등록` : "기록 등록"}
-      </BottomCTA>
+      <LogClick eventName="submit_record">
+        <BottomCTA
+          onClick={handleSubmit}
+          disabled={amount <= 0 || totalPeople === 0}
+          loading={submitting}
+          loadingText="등록 중..."
+          summary={<RecordSummary totalPeople={totalPeople} amount={amount} giftType={giftType} />}
+        >
+          {totalPeople > 0 ? `${totalPeople}명 기록 등록` : "기록 등록"}
+        </BottomCTA>
+      </LogClick>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { ErrorBoundary as ReactErrorBoundary, type FallbackProps } from "react-error-boundary";
+import * as Sentry from "@sentry/nextjs";
 import { AlertCircle, RefreshCw } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "./button";
@@ -68,12 +69,16 @@ interface ErrorBoundaryProps {
   onError?: (error: unknown, info: { componentStack?: string | null }) => void;
 }
 
+function handleError(error: unknown, info: { componentStack?: string | null }) {
+  Sentry.captureException(error, { extra: { componentStack: info.componentStack } });
+}
+
 function ErrorBoundaryRoot({ children, onReset, onError }: ErrorBoundaryProps) {
   return (
     <ReactErrorBoundary
       FallbackComponent={DefaultErrorFallback}
       onReset={onReset}
-      onError={onError}
+      onError={onError ?? handleError}
     >
       {children}
     </ReactErrorBoundary>
@@ -85,7 +90,7 @@ function ErrorBoundaryCompact({ children, onReset, onError }: ErrorBoundaryProps
     <ReactErrorBoundary
       FallbackComponent={CompactErrorFallback}
       onReset={onReset}
-      onError={onError}
+      onError={onError ?? handleError}
     >
       {children}
     </ReactErrorBoundary>
@@ -101,7 +106,7 @@ function ErrorBoundaryCustom({ children, fallback, onReset, onError }: CustomErr
     <ReactErrorBoundary
       fallback={fallback}
       onReset={onReset}
-      onError={onError}
+      onError={onError ?? handleError}
     >
       {children}
     </ReactErrorBoundary>

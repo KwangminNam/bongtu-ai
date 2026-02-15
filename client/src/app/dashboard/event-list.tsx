@@ -5,6 +5,7 @@ import { ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { LogScreen } from "@/lib/logging";
 import type { Event } from "@/lib/api";
 
 const TYPE_LABEL: Record<string, string> = {
@@ -56,32 +57,35 @@ const itemVariants = {
 export function EventList({ events }: { events: Event[] }) {
   if (events.length === 0) {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col items-center justify-center py-16"
-      >
+      <LogScreen params={{ eventCount: 0 }}>
         <motion.div
-          animate={{
-            y: [0, -8, 0],
-            rotate: [0, 5, -5, 0],
-          }}
-          transition={{
-            duration: 3,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="text-6xl mb-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col items-center justify-center py-16"
         >
-          📋
+          <motion.div
+            animate={{
+              y: [0, -8, 0],
+              rotate: [0, 5, -5, 0],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="text-6xl mb-4"
+          >
+            📋
+          </motion.div>
+          <p className="text-muted-foreground font-medium">아직 등록된 이벤트가 없어요</p>
+          <p className="text-sm text-muted-foreground mt-1">새 이벤트를 등록해보세요!</p>
         </motion.div>
-        <p className="text-muted-foreground font-medium">아직 등록된 이벤트가 없어요</p>
-        <p className="text-sm text-muted-foreground mt-1">새 이벤트를 등록해보세요!</p>
-      </motion.div>
+      </LogScreen>
     );
   }
 
   return (
+    <LogScreen params={{ eventCount: events.length }}>
     <motion.div
       variants={containerVariants}
       initial="hidden"
@@ -156,5 +160,6 @@ export function EventList({ events }: { events: Event[] }) {
         );
       })}
     </motion.div>
+    </LogScreen>
   );
 }

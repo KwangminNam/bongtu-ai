@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Suspense } from "@/components/ui/suspense";
+import { LogClick } from "@/lib/logging";
 import { createFetchClient } from "@/lib/fetch-client";
 import { auth } from "@/lib/auth";
 import { EventList } from "./event-list";
@@ -39,11 +40,13 @@ export default function DashboardPage() {
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">이벤트 목록</p>
         </div>
-        <Button size="sm" className="rounded-full shadow-md" asChild>
-          <Link href="/dashboard/events/new">
-            <Plus size={16} className="mr-1" />새 이벤트
-          </Link>
-        </Button>
+        <LogClick eventName="new_event">
+          <Button size="sm" className="rounded-full shadow-md" asChild>
+            <Link href="/dashboard/events/new">
+              <Plus size={16} className="mr-1" />새 이벤트
+            </Link>
+          </Button>
+        </LogClick>
       </div>
 
       {/* 이벤트 목록 */}

@@ -22,6 +22,7 @@ import { BackButton } from "@/components/back-button";
 import { api, OcrRecord } from "@/lib/api";
 import { revalidateDashboard } from "@/lib/actions";
 import { cn } from "@/lib/utils";
+import { LogScreen, LogClick } from "@/lib/logging";
 
 const EVENT_TYPES = [
   {
@@ -186,6 +187,7 @@ export function OcrEventForm() {
   const canSubmit = title && type && date && validRecords.length > 0;
 
   return (
+    <LogScreen>
     <div className="flex flex-col h-full bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900">
       <div className="flex-1 min-h-0 overflow-y-auto">
         {/* 헤더 */}
@@ -236,6 +238,7 @@ export function OcrEventForm() {
               exit={{ opacity: 0, x: -20 }}
               className="flex flex-col gap-6"
             >
+              <LogClick eventName="ocr_upload">
               <div
                 onDrop={handleDrop}
                 onDragOver={(e) => e.preventDefault()}
@@ -300,6 +303,7 @@ export function OcrEventForm() {
                   className="hidden"
                 />
               </div>
+              </LogClick>
 
               <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900">
                 <p className="text-sm text-amber-800 dark:text-amber-200">
@@ -551,5 +555,6 @@ export function OcrEventForm() {
         </div>
       </motion.div>
     </div>
+    </LogScreen>
   );
 }

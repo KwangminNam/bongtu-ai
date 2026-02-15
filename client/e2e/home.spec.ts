@@ -11,7 +11,7 @@ test.describe("홈페이지 (인트로 → 로그인)", () => {
 
     await expect(page.locator("h1")).toHaveText("마음장부");
     await expect(page.getByText("경조사 내역을 기록하고")).toBeVisible();
-    await expect(page.getByText("AI가 적정 금액을 제안해드려요")).toBeVisible();
+    await expect(page.getByText("AI가 경조사 내역을 분석하고 관리도 해드려요")).toBeVisible();
 
     const ctaButton = page.getByRole("button", { name: /로그인하고 시작하기/ });
     await expect(ctaButton).toBeVisible();

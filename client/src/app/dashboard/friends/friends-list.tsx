@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { api, type Friend } from "@/lib/api";
+import { LogScreen } from "@/lib/logging";
 import { FriendCards, FriendCardsSkeleton } from "./friend-cards";
 
 const RELATION_FILTERS = ["전체", "친구", "직장", "가족", "기타"];
@@ -57,6 +58,7 @@ export function FriendsList({ friendsPromise }: FriendsListProps) {
   const hasLocalAdditions = localFriends.length > 0 && initialLoadDone.current;
 
   return (
+    <LogScreen>
     <div className="flex flex-col px-5 pt-14 pb-4">
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-6">
@@ -179,6 +181,7 @@ export function FriendsList({ friendsPromise }: FriendsListProps) {
         </Suspense.Skeleton>
       )}
     </div>
+    </LogScreen>
   );
 }
 

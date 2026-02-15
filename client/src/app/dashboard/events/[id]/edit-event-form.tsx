@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { containerVariants } from "@/lib/animations";
+import { LogScreen } from "@/lib/logging";
 import { useEditEventForm, useEventMessage } from "./_hooks";
 import {
   EventInfoCard,
@@ -40,6 +41,7 @@ export function EditEventForm({
   const eventMessage = useEventMessage(initialType, initialDate);
 
   return (
+    <LogScreen params={{ eventId }}>
     <AnimatePresence mode="wait">
       {form.isEditing ? (
         <EventEditForm
@@ -91,5 +93,6 @@ export function EditEventForm({
         </motion.div>
       )}
     </AnimatePresence>
+    </LogScreen>
   );
 }

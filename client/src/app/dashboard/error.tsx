@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import * as Sentry from "@sentry/nextjs";
 import { AlertCircle, RefreshCw, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -16,7 +17,7 @@ export default function DashboardError({ error, reset }: DashboardErrorProps) {
   const router = useRouter();
 
   useEffect(() => {
-    console.error("Dashboard Error:", error);
+    Sentry.captureException(error);
   }, [error]);
 
   return (

@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { BackButton } from "@/components/back-button";
 import { cn } from "@/lib/utils";
+import { LogScreen, LogClick } from "@/lib/logging";
 
 const SUGGESTIONS = [
   "내 경조사 기록 요약해줘",
@@ -122,6 +123,7 @@ export function ChatUI() {
   };
 
   return (
+    <LogScreen>
     <div className="flex flex-col h-full">
       {/* 헤더 */}
       <div className="flex items-center gap-3 px-5 pt-14 pb-4 border-b">
@@ -233,11 +235,14 @@ export function ChatUI() {
             className="flex-1 rounded-xl"
             disabled={isLoading}
           />
-          <Button type="submit" size="icon" disabled={isLoading || !input.trim()} className="rounded-xl">
-            <Send size={18} />
-          </Button>
+          <LogClick eventName="send_chat">
+            <Button type="submit" size="icon" disabled={isLoading || !input.trim()} className="rounded-xl">
+              <Send size={18} />
+            </Button>
+          </LogClick>
         </form>
       </div>
     </div>
+    </LogScreen>
   );
 }

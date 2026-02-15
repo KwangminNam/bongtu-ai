@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BookOpen, Users, MessageCircle } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { logClick } from "@/lib/logging/logger";
 
 export default function DashboardLayout({
   children
@@ -33,18 +34,21 @@ export default function DashboardLayout({
             icon={<BookOpen size={20} />}
             label="경조사"
             active={isActive("/dashboard")}
+            onClick={() => logClick(pathname, "nav_tab", { tab: "경조사" })}
           />
           <NavItem
             href="/dashboard/friends"
             icon={<Users size={20} />}
             label="지인"
             active={isActive("/dashboard/friends")}
+            onClick={() => logClick(pathname, "nav_tab", { tab: "지인" })}
           />
           <NavItem
             href="/dashboard/chat"
             icon={<MessageCircle size={20} />}
             label="AI 비서"
             active={isActive("/dashboard/chat")}
+            onClick={() => logClick(pathname, "nav_tab", { tab: "AI 비서" })}
           />
 
           <ThemeToggle />
@@ -58,16 +62,19 @@ function NavItem({
   href,
   icon,
   label,
-  active
+  active,
+  onClick,
 }: {
   href: string;
   icon: React.ReactNode;
   label: string;
   active: boolean;
+  onClick?: () => void;
 }) {
   return (
     <Link
       href={href}
+      onClick={onClick}
       className={`flex flex-col items-center gap-1 transition-colors px-4 py-1 ${
         active ? "text-primary" : "text-muted-foreground hover:text-foreground"
       }`}
