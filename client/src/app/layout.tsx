@@ -15,18 +15,18 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://maeum-jangbu.vercel.app"),
+  metadataBase: new URL("https://bongtu-ai.vercel.app"),
   title: {
-    default: "마음장부",
-    template: "%s | 마음장부",
+    default: "봉투AI",
+    template: "%s | 봉투AI",
   },
   description: "경조사 내역 관리 및 AI 적정 금액 제안 서비스",
   keywords: ["경조사", "축의금", "부의금", "경조사 관리", "AI 금액 제안"],
-  authors: [{ name: "마음장부" }],
+  authors: [{ name: "봉투AI" }],
   openGraph: {
     type: "website",
     locale: "ko_KR",
-    siteName: "마음장부",
+    siteName: "봉투AI",
   },
   twitter: {
     card: "summary_large_image",

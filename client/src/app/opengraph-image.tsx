@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
 
-export const alt = "마음장부 - 경조사 내역 관리";
+export const alt = "봉투AI - 경조사 내역 관리";
 export const size = {
   width: 1200,
   height: 630,
@@ -46,7 +46,7 @@ export default async function Image() {
               marginBottom: 24,
             }}
           >
-            📔 마음장부
+            📔 봉투AI
           </div>
           <div
             style={{

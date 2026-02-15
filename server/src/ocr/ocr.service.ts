@@ -34,7 +34,7 @@ export class OcrService {
   }
 
   async extractRecordsFromImage(base64Image: string): Promise<OcrRecord[]> {
-    const model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     const prompt = `이 이미지는 경조사비 명부(축의금, 조의금 등)입니다.
 이미지에서 이름과 금액을 추출하여 JSON 배열로 반환해주세요.

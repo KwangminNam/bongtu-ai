@@ -1,4 +1,4 @@
-export const SERVICE_NAME = "maum-jangbu";
+export const SERVICE_NAME = "bongtu-ai";
 
 export type LogEventType = "screen_view" | "click";
 

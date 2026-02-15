@@ -1,4 +1,4 @@
-# 마음장부 구현 계획 (하이브리드 C 방식)
+# 봉투AI 구현 계획 (하이브리드 C 방식)
 
 ## Phase 1: Server 기반 구축 (Prisma + Auth)
 
@@ -49,7 +49,7 @@
 - Function tools: `query_records`, `search_friends`, `get_event_stats`, `suggest_amount`
 
 ### 3-2. Client AI 채팅
-- `pnpm --filter @maum-jangbu/client add ai @ai-sdk/openai` (Vercel AI SDK 설치)
+- `pnpm --filter @bongtu-ai/client add ai @ai-sdk/openai` (Vercel AI SDK 설치)
 - `client/src/app/api/chat/route.ts` — Next.js Route Handler (NestJS `/ai/chat`으로 프록시)
 - `client/src/app/(dashboard)/chat/page.tsx` — 채팅 UI (`useChat` 훅)
 - `client/src/components/chat/` — ChatMessage, ChatInput 컴포넌트

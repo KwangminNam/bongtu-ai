@@ -75,7 +75,7 @@ function buildSystemPrompt(data: { events: EventData[]; friends: FriendData[]; u
     })
     .join("\n");
 
-  return `당신은 "${userName}"님의 경조사 기록을 관리하는 AI 어시스턴트 "마음장부"입니다.
+  return `당신은 "${userName}"님의 경조사 기록을 관리하는 AI 어시스턴트 "봉투AI"입니다.
 
 ## 역할
 - 사용자의 경조사 내역을 분석하고 인사이트를 제공합니다

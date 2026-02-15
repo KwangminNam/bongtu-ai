@@ -8,7 +8,7 @@ export function Api({ stack }: StackContext) {
     memorySize: 1024,
     url: {
       cors: {
-        allowedOrigins: ["http://localhost:3000", "https://maeum-jangbu.vercel.app"],
+        allowedOrigins: ["http://localhost:3000", "https://bongtu-ai.vercel.app"],
         allowedMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization", "Accept"],
         allowCredentials: true,

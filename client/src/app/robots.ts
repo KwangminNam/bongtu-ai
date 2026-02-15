@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: "/dashboard/",
     },
-    sitemap: "https://maeum-jangbu.vercel.app/sitemap.xml",
+    sitemap: "https://bongtu-ai.vercel.app/sitemap.xml",
   };
 }

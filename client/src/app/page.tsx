@@ -66,7 +66,7 @@ function WelcomeStep({ onStart }: { onStart: () => void }) {
           transition={{ delay: 0.2, duration: 0.5 }}
           className="text-center mt-4"
         >
-          <h1 className="text-2xl font-bold">마음장부</h1>
+          <h1 className="text-2xl font-bold">봉투AI</h1>
           <p className="text-sm text-muted-foreground mt-2">
             경조사 내역을 기록하고
             <br />
@@ -115,7 +115,7 @@ function LoginStep() {
         >
           <span className="text-3xl text-primary-foreground font-bold">M</span>
         </motion.div>
-        <h1 className="text-2xl font-bold">마음장부</h1>
+        <h1 className="text-2xl font-bold">봉투AI</h1>
       </div>
 
       {/* 소셜 로그인 버튼 */}

@@ -4,7 +4,7 @@ import { Api } from "./stacks/Api";
 export default {
   config(_input) {
     return {
-      name: "maum-jangbu",
+      name: "bongtu-ai",
       region: "ap-northeast-2",
     };
   },

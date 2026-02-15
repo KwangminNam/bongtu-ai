@@ -3,13 +3,13 @@ import { test, expect } from "@playwright/test";
 test.describe("홈페이지 (인트로 → 로그인)", () => {
   test("페이지가 정상적으로 로드된다", async ({ page }) => {
     await page.goto("/");
-    await expect(page).toHaveTitle(/마음장부/);
+    await expect(page).toHaveTitle(/봉투AI/);
   });
 
   test("Welcome 단계: 로고, 앱 이름, CTA 버튼이 표시된다", async ({ page }) => {
     await page.goto("/");
 
-    await expect(page.locator("h1")).toHaveText("마음장부");
+    await expect(page.locator("h1")).toHaveText("봉투AI");
     await expect(page.getByText("경조사 내역을 기록하고")).toBeVisible();
     await expect(page.getByText("AI가 경조사 내역을 분석하고 관리도 해드려요")).toBeVisible();
 
