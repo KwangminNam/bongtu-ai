@@ -4,6 +4,7 @@ import { useReducer } from "react";
 import { signIn } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch-case";
 import { WelcomeLottie } from "@/components/lottie-animations";
 import { LogScreen, LogClick } from "@/lib/logging";
 import {
@@ -31,16 +32,13 @@ export default function LoginPage() {
     <LogScreen>
       <div className="flex flex-col h-full px-8">
         <AnimatePresence mode="wait">
-          {(() => {
-            switch (step) {
-              case "welcome":
-                return <WelcomeStep onStart={() => dispatch({ type: "GO_LOGIN" })} />;
-              case "login":
-                return <LoginStep />;
-              default:
-                return step satisfies never;
-            }
-          })()}
+          <Switch
+            type={step}
+            case={{
+              welcome: <WelcomeStep onStart={() => dispatch({ type: "GO_LOGIN" })} />,
+              login: <LoginStep />,
+            }}
+          />
         </AnimatePresence>
       </div>
     </LogScreen>

@@ -10,6 +10,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch-case";
 import { useAmountContext } from "../_hooks";
 import { useGoldPriceAI } from "../_hooks/useGoldPriceAI";
 
@@ -23,20 +24,18 @@ export function GoldPriceAI({ eventDate }: GoldPriceAIProps) {
 
   if (giftType !== "gold") return null;
 
-  switch (status) {
-    case "idle":
-      return <IdleView onFetch={fetchGoldPrice} />;
-    case "loading":
-      return <LoadingView />;
-    case "streaming":
-      return <StreamingView content={content} />;
-    case "done":
-      return <DoneView content={content} onRetry={fetchGoldPrice} />;
-    case "error":
-      return <ErrorView error={error} onRetry={fetchGoldPrice} />;
-    default:
-      return status satisfies never;
-  }
+  return (
+    <Switch
+      type={status}
+      case={{
+        idle: <IdleView onFetch={fetchGoldPrice} />,
+        loading: <LoadingView />,
+        streaming: <StreamingView content={content} />,
+        done: <DoneView content={content} onRetry={fetchGoldPrice} />,
+        error: <ErrorView error={error} onRetry={fetchGoldPrice} />,
+      }}
+    />
+  );
 }
 
 // ─── Sub Views ───
