@@ -1,8 +1,8 @@
 # 봉투AI 2026.02.03 ~ WIP
 https://bongtu-ai.vercel.app/
 
-> **Vibe Coding**
-> 개발자는 설계와 의사결정만 하고, Claude에게 개발 통제권을 넘겨서 빠르지만 안전하게
+> **Prompt-Driven Development**
+> Claude Code만으로 프로덕션 앱을 만들 수 있는가? 개발자는 설계와 의사결정만 하고, 모든 구현은 프롬프트로만 진행하며 AI 주도 개발의 한계와 가능성을 탐구하는 프로젝트
 
 ## 프로젝트 소개
 
