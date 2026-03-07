@@ -32,7 +32,7 @@ server/src/
 ### Data Fetching & SSR
 - Default to SSR for data fetching
 - Wrap only async components with Suspense/ErrorBoundary, NOT at page level
-- When passing data to client components, pass Promise and use `use()` hook to resolve
+- When passing data to client components, pass Promise and use `<Use>` from react-flowify to unwrap
 - Use Next.js `revalidatePath`/`revalidateTag` for refetching - NO TanStack Query
 
 ### Component & Hook Organization
@@ -63,10 +63,10 @@ server/src/
 - **Form Component Structure**: Split form components into semantic parts
   ```
   FormName/
-  ├── FormNameHeader.tsx      # 제목, 닫기 버튼 등
-  ├── FormNameContents.tsx    # 폼 필드들 (입력, 선택 등)
-  ├── FormNameActions.tsx     # 버튼 영역 (취소, 저장 등)
-  └── index.tsx               # 조합 및 export
+  ├── FormNameHeader.tsx      # Title, close button, etc.
+  ├── FormNameContents.tsx    # Form fields (inputs, selects, etc.)
+  ├── FormNameActions.tsx     # Button area (cancel, save, etc.)
+  └── index.tsx               # Composition and export
   ```
 
 ### Coding Style
@@ -74,6 +74,19 @@ server/src/
 - **Custom hooks**: Use arrow functions (`const useHook = () => {}`)
 - **File naming**: kebab-case for components (e.g., `my-component.tsx`), camelCase for hooks (e.g., `useSomething.ts`)
 - **UI components**: Use shadcn/ui as the base
+- **Declarative JSX**: Use `react-flowify` components instead of imperative patterns:
+
+  | Imperative Pattern | react-flowify | When to Use |
+  |-----------|---------------|-----------|
+  | `{cond && <X />}` | `<Show when={cond}>` | Boolean conditional rendering |
+  | `{cond ? <A /> : <B />}` | `<Show when={cond} fallback={<B />}>` | Conditional + fallback |
+  | `{val && <X name={val.name} />}` | `<Guard when={val}>{(v) => <X name={v.name} />}</Guard>` | Nullable type narrowing |
+  | `switch/case` rendering | `<Switch value={v} by={{ a: <A />, b: <B /> }} />` | Value-based branching |
+  | `items.map(...)` | `<Each items={items} renderEmpty={<Empty />}>{(item, meta) => ...}</Each>` | List + empty state |
+  | Direct `use(promise)` call | `<Use promise={p}>{(data) => ...}</Use>` | Promise unwrap |
+  | Nested Suspense + ErrorBoundary | `<AsyncBoundary suspense={...} errorBoundary={...}>` | Async boundary |
+  | useEffect + ref outside click | `<OutsideClick onOutsideClick={fn}>` | Outside click detection |
+  | CSS media query conditional rendering | `<Responsive.Mobile>` / `<Responsive.Desktop>` | Responsive branching |
 
 ### Code Quality — Frontend Fundamentals
 
@@ -147,41 +160,46 @@ server/src/
 ### TypeScript
 - **No `any` type** - use `unknown` or proper types instead
 - **Reuse types via ComponentProps**: Use `ComponentProps<typeof SomeComponent>` with `Pick`/`Omit` to derive types - avoid duplicating type definitions
-- **Exhaustive switch**: Use `switch` for complex conditionals with `default: satisfies never` to ensure all cases are handled
+- **Exhaustive switch**: Use `switch` with `default: satisfies never` for **logic/value branching** only. For **JSX rendering**, use `<Switch>` from react-flowify instead
   ```typescript
+  // Logic/value branching — use switch
   switch (status) {
-    case "pending": return <Pending />;
-    case "success": return <Success />;
+    case "pending": return "loading...";
+    case "success": return data.name;
     default: return status satisfies never;
   }
+
+  // JSX rendering — use <Switch>
+  <Switch value={status} by={{
+    pending: <Spinner />,
+    success: <SuccessView />,
+    error: <ErrorView />,
+  }} />
   ```
 ### State Management
 - **Prefer useReducer over multiple useState**: When managing related state values, use `useReducer` instead of multiple `useState` calls
 
-### Suspense & Loading UI
-- Use the custom `Suspense` compound component from `@/components/ui/suspense`
-- Available variants: `Suspense.Spinner`, `Suspense.Skeleton`, `Suspense.CardSkeleton`
-- To add new loading UI patterns, extend the compound component in `suspense.tsx`
+### Suspense & Error Handling
+- **Global error**: `app/error.tsx`, `app/dashboard/error.tsx` - handled automatically by Next.js
+- **Suspense + ErrorBoundary together**: Use `<AsyncBoundary>` from react-flowify
   ```tsx
-  // Usage
+  <AsyncBoundary
+    suspense={{ fallback: <Skeleton /> }}
+    errorBoundary={{ fallback: <ErrorUI /> }}
+  >
+    <AsyncComponent />
+  </AsyncBoundary>
+  ```
+- **Suspense only** (no error boundary needed): Use `Suspense` compound component from `@/components/ui/suspense`
+  - Available variants: `Suspense.Spinner`, `Suspense.Skeleton`, `Suspense.CardSkeleton`
+  ```tsx
   <Suspense.Skeleton skeleton={<MySkeleton />}>
     <AsyncComponent />
   </Suspense.Skeleton>
   ```
-
-### Error Handling
-- **Global error**: `app/error.tsx`, `app/dashboard/error.tsx` - Next.js 자동 처리
-- **Specific area**: `ErrorBoundary` compound component from `@/components/ui/error-boundary`
-- Available variants: `ErrorBoundary` (default), `ErrorBoundary.Compact`, `ErrorBoundary.Custom`
+- **ErrorBoundary only** (no suspense needed): Use `ErrorBoundary` compound component from `@/components/ui/error-boundary`
+  - Available variants: `ErrorBoundary` (default), `ErrorBoundary.Compact`, `ErrorBoundary.Custom`
   ```tsx
-  // Suspense와 함께 사용
-  <ErrorBoundary>
-    <Suspense.Skeleton skeleton={<MySkeleton />}>
-      <AsyncComponent />
-    </Suspense.Skeleton>
-  </ErrorBoundary>
-
-  // 간단한 에러 표시
   <ErrorBoundary.Compact>
     <Component />
   </ErrorBoundary.Compact>
@@ -196,14 +214,14 @@ server/src/
 - Response structure:
   ```typescript
   interface ApiResponse<T> {
-    result: T | null;    // 성공 시 데이터, 에러 시 null
-    error: ApiError | null;  // 성공 시 null, 에러 시 에러 정보
+    result: T | null;    // Data on success, null on error
+    error: ApiError | null;  // null on success, error info on failure
   }
 
   interface ApiError {
-    code: string;        // VALIDATION_ERROR, NOT_FOUND, UNAUTHORIZED 등
-    message: string;     // 사용자에게 보여줄 메시지
-    details?: unknown;   // 추가 정보 (validation 에러 목록 등)
+    code: string;        // VALIDATION_ERROR, NOT_FOUND, UNAUTHORIZED, etc.
+    message: string;     // User-facing message
+    details?: unknown;   // Additional info (validation error list, etc.)
   }
   ```
 - **Success response**: `{ result: { id, title, ... }, error: null }`
@@ -217,10 +235,10 @@ server/src/
   | 404 | `NOT_FOUND` |
   | 409 | `CONFLICT` |
   | 500 | `INTERNAL_ERROR` |
-- **Frontend usage**: `fetch-client.ts`가 자동으로 `result` 추출, `error` 시 `ApiException` throw
+- **Frontend usage**: `fetch-client.ts` automatically extracts `result`, throws `ApiException` on `error`
   ```typescript
   try {
-    const event = await api.events.get("123"); // 자동 result 추출
+    const event = await api.events.get("123"); // auto result extraction
   } catch (e) {
     if (e instanceof ApiException) {
       console.log(e.code, e.message);
@@ -230,7 +248,7 @@ server/src/
 
 ### Testing & Development Cycle
 - **Always write tests for important logic**: When creating functions or hooks with significant logic, write test code
-- **Development cycle**: 개발 → 테스트 작성 → `pnpm test:run` 확인 → 완료
+- **Development cycle**: Develop → Write tests → Verify with `pnpm test:run` → Done
 - **What to test (unit)**:
   - Custom hooks with state management (useReducer, complex useState)
   - Utility functions with business logic

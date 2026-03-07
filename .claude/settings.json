@@ -1,0 +1,20 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "command": "FILE=$(echo \"$CLAUDE_TOOL_INPUT\" | sed -n 's/.*\"file_path\"[[:space:]]*:[[:space:]]*\"\\([^\"]*\\)\".*/\\1/p'); if echo \"$FILE\" | grep -qE '\\.(tsx?|jsx?)$'; then if echo \"$FILE\" | grep -q '/client/'; then cd /Users/namgwangmin/Desktop/gyeongjo-ai/client && npx tsc --noEmit --pretty 2>&1 | tail -20; elif echo \"$FILE\" | grep -q '/server/'; then cd /Users/namgwangmin/Desktop/gyeongjo-ai/server && npx tsc --noEmit --pretty 2>&1 | tail -20; fi; fi"
+      },
+      {
+        "matcher": "Edit|Write",
+        "command": "FILE=$(echo \"$CLAUDE_TOOL_INPUT\" | sed -n 's/.*\"file_path\"[[:space:]]*:[[:space:]]*\"\\([^\"]*\\)\".*/\\1/p'); if echo \"$FILE\" | grep -qE '\\.(tsx?|jsx?)$'; then if echo \"$FILE\" | grep -q '/client/'; then cd /Users/namgwangmin/Desktop/gyeongjo-ai/client && npx eslint \"$FILE\" --no-warn-ignored 2>&1 | tail -15; elif echo \"$FILE\" | grep -q '/server/'; then cd /Users/namgwangmin/Desktop/gyeongjo-ai/server && npx eslint \"$FILE\" --no-warn-ignored 2>&1 | tail -15; fi; fi"
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "command": "CMD=$(echo \"$CLAUDE_TOOL_INPUT\" | sed -n 's/.*\"command\"[[:space:]]*:[[:space:]]*\"\\([^\"]*\\)\".*/\\1/p'); if echo \"$CMD\" | grep -qE '(rm\\s+-rf|git\\s+push\\s+--force|git\\s+reset\\s+--hard|drop\\s+table|git\\s+clean\\s+-f)'; then echo 'BLOCKED: 위험한 명령어가 감지되었습니다. 정말 실행하시겠습니까?' >&2; exit 1; fi"
+      }
+    ]
+  }
+}
