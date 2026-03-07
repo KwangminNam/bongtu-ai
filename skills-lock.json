@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "skills": {
+    "find-skills": {
+      "source": "vercel-labs/skills",
+      "sourceType": "github",
+      "computedHash": "6412eb4eb3b91595ebab937f0c69501240e7ba761b3d82510b5cf506ec5c7adc"
+    },
+    "frontend-code-review": {
+      "source": "langgenius/dify",
+      "sourceType": "github",
+      "computedHash": "79fa87cd5460c80dc842153155b26bd4a3cad9858475c2e1ee50cab6dcd1fbbe"
+    },
+    "karpathy-guidelines": {
+      "source": "forrestchang/andrej-karpathy-skills",
+      "sourceType": "github",
+      "computedHash": "41e8ca055bbde13d240776a14a076a59614057200340c243130a76ba4e64cac8"
+    },
+    "nestjs-best-practices": {
+      "source": "kadajett/agent-nestjs-skills",
+      "sourceType": "github",
+      "computedHash": "1b6f82e889d19d305e38e35594de08eca0242321f353cafa4cf5e61dd3aa1a73"
+    },
+    "next-best-practices": {
+      "source": "vercel-labs/next-skills",
+      "sourceType": "github",
+      "computedHash": "515ba75178bd44875812d9a560bdf14651f86709f89cf1d4f209638e879807f3"
+    },
+    "playwright-generate-test": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "8f963da3e25f705ff39755b8b990f20da0c0320cb86ac83fcc4d2d4eca91f6e4"
+    },
+    "toss-frontend-fundamentals": {
+      "source": "leekensei/agent-skills",
+      "sourceType": "github",
+      "computedHash": "225666efc9645ba1d4af0fa5ab9947ba7aa32c9a4efe8b45440f70d8ef639202"
+    },
+    "vercel-react-best-practices": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "3462ec83f862abb2d532953df33a4dbf87f4616849da5d4b5cc7c13601aaf997"
+    }
+  }
+}
