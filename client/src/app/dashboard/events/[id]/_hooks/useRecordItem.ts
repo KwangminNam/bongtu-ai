@@ -6,47 +6,13 @@ import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { revalidateEventDetail, revalidateDashboard } from "@/lib/actions";
 import type { GoldKarat } from "@/lib/types";
-
-// ─── Gold Memo Utils ───
-type GoldQuantities = Record<GoldKarat, number>;
-
-const INITIAL_GOLD_QUANTITIES: GoldQuantities = { "24K": 0, "18K": 0, "14K": 0 };
-const KARATS: GoldKarat[] = ["24K", "18K", "14K"];
-
-export function parseGoldMemo(memo: string | null): {
-  goldQuantities: GoldQuantities;
-  userMemo: string;
-} {
-  if (!memo) return { goldQuantities: INITIAL_GOLD_QUANTITIES, userMemo: "" };
-
-  const [goldPart, ...rest] = memo.split(" - ");
-  const userMemo = rest.join(" - ").trim();
-
-  const quantities: GoldQuantities = { ...INITIAL_GOLD_QUANTITIES };
-  for (const karat of KARATS) {
-    const match = goldPart.match(new RegExp(`${karat}\\s+(\\d+)개`));
-    if (match) {
-      quantities[karat] = Number(match[1]);
-    }
-  }
-
-  const hasAnyGold = KARATS.some((k) => quantities[k] > 0);
-  if (!hasAnyGold) return { goldQuantities: INITIAL_GOLD_QUANTITIES, userMemo: memo };
-
-  return { goldQuantities: quantities, userMemo };
-}
-
-export function buildGoldMemo(goldQuantities: GoldQuantities, userMemo: string): string {
-  const parts: string[] = [];
-  for (const k of KARATS) {
-    if (goldQuantities[k] > 0) {
-      parts.push(`${k} ${goldQuantities[k]}개`);
-    }
-  }
-  const goldSummary = parts.join(", ");
-  if (!goldSummary) return userMemo;
-  return userMemo ? `${goldSummary} - ${userMemo}` : goldSummary;
-}
+import {
+  type GoldQuantities,
+  INITIAL_GOLD_QUANTITIES,
+  parseGoldMemo,
+  buildGoldMemo,
+  calcTotalGoldCount,
+} from "@/lib/gold-memo";
 
 // ─── State & Actions ───
 interface RecordItemState {
@@ -169,10 +135,7 @@ export const useRecordItem = ({
     dispatch({ type: "SET_GOLD_QUANTITY", payload: { karat, quantity } });
   }, []);
 
-  const totalGoldCount =
-    state.goldQuantities["24K"] +
-    state.goldQuantities["18K"] +
-    state.goldQuantities["14K"];
+  const totalGoldCount = calcTotalGoldCount(state.goldQuantities);
 
   const handleSave = useCallback(async () => {
     dispatch({ type: "SET_SAVING", payload: true });

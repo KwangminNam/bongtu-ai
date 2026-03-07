@@ -29,7 +29,8 @@ vi.mock("@/lib/actions", () => ({
   revalidateDashboard: vi.fn(),
 }));
 
-import { useRecordItem, parseGoldMemo, buildGoldMemo } from "./useRecordItem";
+import { useRecordItem } from "./useRecordItem";
+import { parseGoldMemo, buildGoldMemo } from "@/lib/gold-memo";
 
 describe("useRecordItem", () => {
   beforeEach(() => {

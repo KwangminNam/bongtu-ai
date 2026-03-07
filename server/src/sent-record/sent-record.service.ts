@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateSentRecordDto } from './dto/create-sent-record.dto.js';
 import { UpdateSentRecordDto } from './dto/update-sent-record.dto.js';
@@ -21,7 +21,7 @@ export class SentRecordService {
     });
 
     if (!friend) {
-      throw new Error('Friend not found');
+      throw new NotFoundException('Friend not found');
     }
 
     return this.prisma.sentRecord.create({

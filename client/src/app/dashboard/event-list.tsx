@@ -8,27 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { LogScreen } from "@/lib/logging";
 import { Each } from "react-flowify";
 import type { Event } from "@/lib/api";
-
-const TYPE_LABEL: Record<string, string> = {
-  WEDDING: "결혼",
-  FUNERAL: "장례",
-  BIRTHDAY: "생일/잔치",
-  ETC: "기타",
-};
-
-const TYPE_EMOJI: Record<string, string> = {
-  WEDDING: "💒",
-  FUNERAL: "🕯️",
-  BIRTHDAY: "🎂",
-  ETC: "🎉",
-};
-
-const TYPE_GRADIENT: Record<string, string> = {
-  WEDDING: "from-pink-50 to-rose-50 dark:from-pink-950/30 dark:to-rose-950/30",
-  FUNERAL: "from-purple-50 to-violet-50 dark:from-purple-950/30 dark:to-violet-950/30",
-  BIRTHDAY: "from-amber-50 to-yellow-50 dark:from-amber-950/30 dark:to-yellow-950/30",
-  ETC: "from-slate-50 to-gray-50 dark:from-slate-950/30 dark:to-gray-950/30",
-};
+import { EVENT_TYPE_LABELS, EVENT_TYPE_EMOJIS, EVENT_TYPE_GRADIENTS } from "@/lib/constants";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -102,9 +82,9 @@ export function EventList({ events }: { events: Event[] }) {
                     whileTap={{ scale: 0.98 }}
                     transition={{ type: "spring", stiffness: 400, damping: 25 }}
                   >
-                    <Card className={`p-4 bg-gradient-to-r ${TYPE_GRADIENT[event.type] || TYPE_GRADIENT.ETC} border-0 shadow-sm hover:shadow-lg transition-shadow overflow-hidden relative`}>
+                    <Card className={`p-4 bg-gradient-to-r ${EVENT_TYPE_GRADIENTS[event.type] || EVENT_TYPE_GRADIENTS.ETC} border-0 shadow-sm hover:shadow-lg transition-shadow overflow-hidden relative`}>
                       <div className="absolute top-0 right-0 w-24 h-24 opacity-10">
-                        <span className="text-7xl">{TYPE_EMOJI[event.type] || "🎉"}</span>
+                        <span className="text-7xl">{EVENT_TYPE_EMOJIS[event.type] || "🎉"}</span>
                       </div>
                       <div className="flex items-center justify-between relative">
                         <div className="flex items-center gap-3">
@@ -114,7 +94,7 @@ export function EventList({ events }: { events: Event[] }) {
                             transition={{ delay: index * 0.05 + 0.2, type: "spring" }}
                             className="w-11 h-11 rounded-2xl bg-white/80 dark:bg-slate-800/80 shadow-sm flex items-center justify-center"
                           >
-                            <span className="text-xl">{TYPE_EMOJI[event.type] || "🎉"}</span>
+                            <span className="text-xl">{EVENT_TYPE_EMOJIS[event.type] || "🎉"}</span>
                           </motion.div>
                           <div className="flex flex-col gap-0.5">
                             <div className="flex items-center gap-2">
@@ -122,7 +102,7 @@ export function EventList({ events }: { events: Event[] }) {
                             </div>
                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
                               <Badge variant="secondary" className="rounded-full px-2 py-0 text-[10px] font-normal">
-                                {TYPE_LABEL[event.type] || event.type}
+                                {EVENT_TYPE_LABELS[event.type] || event.type}
                               </Badge>
                               <span>
                                 {new Date(event.date).toLocaleDateString("ko-KR", {

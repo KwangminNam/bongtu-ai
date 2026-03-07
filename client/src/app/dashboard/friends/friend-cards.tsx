@@ -10,7 +10,7 @@ interface FriendCardsProps {
   friends: Friend[];
   search: string;
   filter: string;
-  onFriendsLoaded: (friends: Friend[]) => void;
+  onFriendsLoaded?: (friends: Friend[]) => void;
 }
 
 export function FriendCards({
@@ -20,7 +20,7 @@ export function FriendCards({
   onFriendsLoaded,
 }: FriendCardsProps) {
   useEffect(() => {
-    onFriendsLoaded(friends);
+    onFriendsLoaded?.(friends);
   }, [friends, onFriendsLoaded]);
 
   const filtered = friends.filter((f) => {

@@ -77,10 +77,15 @@ export const RELATION_SUGGESTIONS = [
   "지인",
 ] as const;
 
-// ── Event Type Labels ──
-export const EVENT_TYPE_LABELS: Record<string, string> = {
-  WEDDING: "결혼",
-  FUNERAL: "장례",
-  BIRTHDAY: "생일/잔치",
-  ETC: "기타",
-} as const;
+// ── Event Type Lookup Maps (derived from EVENT_TYPES) ──
+export const EVENT_TYPE_LABELS: Record<string, string> = Object.fromEntries(
+  EVENT_TYPES.map((t) => [t.value, t.label])
+);
+
+export const EVENT_TYPE_EMOJIS: Record<string, string> = Object.fromEntries(
+  EVENT_TYPES.map((t) => [t.value, t.emoji])
+);
+
+export const EVENT_TYPE_GRADIENTS: Record<string, string> = Object.fromEntries(
+  EVENT_TYPES.map((t) => [t.value, t.gradient])
+);

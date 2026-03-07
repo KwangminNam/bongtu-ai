@@ -2,9 +2,12 @@
 
 import { useReducer, useCallback, useMemo, createContext, useContext } from "react";
 import type { GiftType, GoldKarat } from "@/lib/types";
-
-// ─── State & Actions ───
-type GoldQuantities = Record<GoldKarat, number>;
+import {
+  type GoldQuantities,
+  INITIAL_GOLD_QUANTITIES,
+  buildGoldSummary,
+  calcTotalGoldCount,
+} from "@/lib/gold-memo";
 
 interface AmountState {
   giftType: GiftType;
@@ -18,12 +21,6 @@ type AmountAction =
   | { type: "SELECT_AMOUNT"; payload: number }
   | { type: "SET_CUSTOM_AMOUNT"; payload: string }
   | { type: "SET_GOLD_QUANTITY"; payload: { karat: GoldKarat; quantity: number } };
-
-const INITIAL_GOLD_QUANTITIES: GoldQuantities = {
-  "24K": 0,
-  "18K": 0,
-  "14K": 0,
-};
 
 const initialState: AmountState = {
   giftType: "cash",
@@ -101,23 +98,14 @@ export const useAmount = () => {
     state.selectedAmount ?? (state.customAmount ? Number(state.customAmount) : 0);
 
   const totalGoldCount = useMemo(
-    () =>
-      state.goldQuantities["24K"] +
-      state.goldQuantities["18K"] +
-      state.goldQuantities["14K"],
+    () => calcTotalGoldCount(state.goldQuantities),
     [state.goldQuantities]
   );
 
-  const goldSummary = useMemo(() => {
-    const parts: string[] = [];
-    const karats: GoldKarat[] = ["24K", "18K", "14K"];
-    for (const k of karats) {
-      if (state.goldQuantities[k] > 0) {
-        parts.push(`${k} ${state.goldQuantities[k]}개`);
-      }
-    }
-    return parts.join(", ");
-  }, [state.goldQuantities]);
+  const goldSummary = useMemo(
+    () => buildGoldSummary(state.goldQuantities),
+    [state.goldQuantities]
+  );
 
   const amount = state.giftType === "cash" ? cashAmount : totalGoldCount;
 

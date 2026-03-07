@@ -8,6 +8,7 @@ import { BottomCTA } from "@/components/bottom-cta";
 import { api, type Friend } from "@/lib/api";
 import { revalidateEventDetail, revalidateFriends } from "@/lib/actions";
 import { LogScreen, LogClick } from "@/lib/logging";
+import { buildGoldMemo } from "@/lib/gold-memo";
 import {
   AmountSelection,
   FriendInput,
@@ -22,10 +23,6 @@ interface RecordFormProps {
 }
 
 export function RecordForm({ eventId, eventDate, friendsPromise }: RecordFormProps) {
-  const router = useRouter();
-  const [memo, setMemo] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-
   return (
     <LogScreen params={{ eventId }}>
     <AmountSelection>
@@ -34,11 +31,6 @@ export function RecordForm({ eventId, eventDate, friendsPromise }: RecordFormPro
           eventId={eventId}
           eventDate={eventDate}
           friendsPromise={friendsPromise}
-          memo={memo}
-          setMemo={setMemo}
-          submitting={submitting}
-          setSubmitting={setSubmitting}
-          router={router}
         />
       </FriendInput>
     </AmountSelection>
@@ -50,24 +42,14 @@ interface RecordFormContentProps {
   eventId: string;
   eventDate: string | null;
   friendsPromise: Promise<Friend[]>;
-  memo: string;
-  setMemo: (memo: string) => void;
-  submitting: boolean;
-  setSubmitting: (submitting: boolean) => void;
-  router: ReturnType<typeof useRouter>;
 }
 
-function RecordFormContent({
-  eventId,
-  eventDate,
-  friendsPromise,
-  memo,
-  setMemo,
-  submitting,
-  setSubmitting,
-  router,
-}: RecordFormContentProps) {
-  const { amount, giftType, goldSummary } = AmountSelection.useContext();
+function RecordFormContent({ eventId, eventDate, friendsPromise }: RecordFormContentProps) {
+  const router = useRouter();
+  const [memo, setMemo] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const { amount, giftType, goldQuantities } = AmountSelection.useContext();
   const { totalPeople, selectedFriendIds, getAllNewFriends } = FriendInput.useContext();
 
   const handleSubmit = async () => {
@@ -77,18 +59,16 @@ function RecordFormContent({
     try {
       const friendsToCreate = getAllNewFriends();
 
-      const createdFriendIds: string[] = [];
-      for (const friend of friendsToCreate) {
-        const created = await api.friends.create(friend);
-        createdFriendIds.push(created.id);
-      }
+      const createdFriends = await Promise.all(
+        friendsToCreate.map((friend) => api.friends.create(friend))
+      );
+      const createdFriendIds = createdFriends.map((f) => f.id);
 
       const allFriendIds = [...selectedFriendIds, ...createdFriendIds];
 
-      let finalMemo = memo;
-      if (giftType === "gold" && goldSummary) {
-        finalMemo = memo ? `${goldSummary} - ${memo}` : goldSummary;
-      }
+      const finalMemo = giftType === "gold"
+        ? buildGoldMemo(goldQuantities, memo)
+        : memo;
 
       await api.records.create({
         amount,

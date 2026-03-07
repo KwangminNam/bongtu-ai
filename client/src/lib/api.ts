@@ -26,9 +26,12 @@ export const api = {
     create: (data: CreateEvent) => client.post<Event>("/events", data),
     update: (id: string, data: Partial<CreateEvent>) => client.patch<Event>(`/events/${id}`, data),
     delete: (id: string) => client.delete(`/events/${id}`),
-    ocr: (image: string) => client.post<OcrExtractResult>("/events/ocr", { image }),
     ocrBulk: (data: CreateEventOcr) => client.post<OcrBulkResult>("/events/ocr-bulk", data),
-    getGoldPrice: () => client.get<GoldPriceResult>("/events/gold-price"),
+  },
+
+  ocr: {
+    extract: (image: string) => client.post<OcrExtractResult>("/ocr/extract", { image }),
+    getGoldPrice: () => client.get<GoldPriceResult>("/ocr/gold-price"),
   },
 
   friends: {

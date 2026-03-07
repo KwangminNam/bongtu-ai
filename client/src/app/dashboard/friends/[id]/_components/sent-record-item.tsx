@@ -17,16 +17,9 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Each } from "react-flowify";
-import { EVENT_TYPE_LABELS } from "@/lib/constants";
+import { EVENT_TYPES, EVENT_TYPE_LABELS } from "@/lib/constants";
 import { useSentRecordItem } from "../_hooks/useSentRecordItem";
 import type { SentRecord } from "@/lib/api";
-
-const EVENT_TYPES = [
-  { value: "WEDDING", label: "결혼" },
-  { value: "FUNERAL", label: "장례" },
-  { value: "BIRTHDAY", label: "생일/잔치" },
-  { value: "ETC", label: "기타" },
-];
 
 interface SentRecordItemProps {
   record: SentRecord;

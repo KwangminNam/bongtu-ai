@@ -7,6 +7,7 @@ import { EventModule } from './event/event.module.js';
 import { FriendModule } from './friend/friend.module.js';
 import { RecordModule } from './record/record.module.js';
 import { SentRecordModule } from './sent-record/sent-record.module.js';
+import { OcrModule } from './ocr/ocr.module.js';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { SentRecordModule } from './sent-record/sent-record.module.js';
     FriendModule,
     RecordModule,
     SentRecordModule,
+    OcrModule,
   ],
 })
 export class AppModule {}
