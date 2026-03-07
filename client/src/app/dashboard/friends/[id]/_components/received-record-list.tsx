@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EVENT_TYPE_LABELS } from "@/lib/constants";
 import { formatAmount } from "@/lib/utils";
+import { Each } from "react-flowify";
 
 interface ReceivedRecord {
   id: string;
@@ -16,17 +17,16 @@ interface ReceivedRecordListProps {
 }
 
 export function ReceivedRecordList({ records }: ReceivedRecordListProps) {
-  if (records.length === 0) {
-    return (
-      <p className="text-sm text-muted-foreground text-center py-4">
-        받은 기록이 없습니다
-      </p>
-    );
-  }
-
   return (
-    <div className="flex flex-col gap-2">
-      {records.map((record) => (
+    <Each
+      items={records}
+      renderEmpty={
+        <p className="text-sm text-muted-foreground text-center py-4">
+          받은 기록이 없습니다
+        </p>
+      }
+    >
+      {(record) => (
         <Card key={record.id} className="p-3">
           <div className="flex items-center justify-between">
             <div>
@@ -47,7 +47,7 @@ export function ReceivedRecordList({ records }: ReceivedRecordListProps) {
             </div>
           </div>
         </Card>
-      ))}
-    </div>
+      )}
+    </Each>
   );
 }

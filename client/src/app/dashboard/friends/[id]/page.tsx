@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Suspense } from "@/components/ui/suspense";
+import { AsyncBoundary } from "react-flowify";
 import { createFetchClient } from "@/lib/fetch-client";
 import { auth } from "@/lib/auth";
 import { BackButton } from "@/components/back-button";
@@ -120,21 +120,24 @@ export default async function FriendDetailPage({
     <div className="flex flex-col px-5 pt-14 pb-4">
       <div className="flex items-center gap-3 mb-6">
         <BackButton />
-        <Suspense.Skeleton
-          skeleton={
-            <div className="space-y-2">
-              <div className="h-6 w-24 bg-muted rounded animate-pulse" />
-              <div className="h-4 w-16 bg-muted rounded animate-pulse" />
-            </div>
-          }
+        <AsyncBoundary
+          suspense={{
+            fallback: (
+              <div className="space-y-2">
+                <div className="h-6 w-24 bg-muted rounded animate-pulse" />
+                <div className="h-4 w-16 bg-muted rounded animate-pulse" />
+              </div>
+            ),
+          }}
+          errorBoundary={{ fallback: <p className="text-sm text-muted-foreground">오류 발생</p> }}
         >
           <FriendHeader id={id} />
-        </Suspense.Skeleton>
+        </AsyncBoundary>
       </div>
 
-      <Suspense.Skeleton skeleton={<FriendContentSkeleton />}>
+      <AsyncBoundary suspense={{ fallback: <FriendContentSkeleton /> }} errorBoundary={{ fallback: <p className="text-sm text-muted-foreground text-center py-10">데이터를 불러오지 못했습니다</p> }}>
         <FriendContent id={id} />
-      </Suspense.Skeleton>
+      </AsyncBoundary>
     </div>
   );
 }

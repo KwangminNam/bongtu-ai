@@ -1,25 +1,24 @@
 "use client";
 
-import { use, useEffect } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import { ChevronRight, CheckCircle2, Users } from "lucide-react";
+import { Each, Show } from "react-flowify";
 import type { Friend } from "@/lib/api";
 
 interface FriendCardsProps {
-  friendsPromise: Promise<Friend[]>;
+  friends: Friend[];
   search: string;
   filter: string;
   onFriendsLoaded: (friends: Friend[]) => void;
 }
 
 export function FriendCards({
-  friendsPromise,
+  friends,
   search,
   filter,
   onFriendsLoaded,
 }: FriendCardsProps) {
-  const friends = use(friendsPromise);
-
   useEffect(() => {
     onFriendsLoaded(friends);
   }, [friends, onFriendsLoaded]);
@@ -30,22 +29,21 @@ export function FriendCards({
     return matchSearch && matchFilter;
   });
 
-  if (filtered.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16">
-        <div className="w-16 h-16 rounded-2xl bg-accent flex items-center justify-center mb-4">
-          <Users size={28} className="text-primary" />
-        </div>
-        <p className="text-sm text-muted-foreground">
-          {friends.length === 0 ? "등록된 지인이 없습니다" : "검색 결과가 없습니다"}
-        </p>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex flex-col gap-3">
-      {filtered.map((friend) => {
+    <Each
+      items={filtered}
+      renderEmpty={
+        <div className="flex flex-col items-center justify-center py-16">
+          <div className="w-16 h-16 rounded-2xl bg-accent flex items-center justify-center mb-4">
+            <Users size={28} className="text-primary" />
+          </div>
+          <p className="text-sm text-muted-foreground">
+            {friends.length === 0 ? "등록된 지인이 없습니다" : "검색 결과가 없습니다"}
+          </p>
+        </div>
+      }
+    >
+      {(friend) => {
         const records = friend.records ?? [];
         const totalAmount = records
           .filter((r) => r.giftType !== "gold")
@@ -62,9 +60,9 @@ export function FriendCards({
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="font-semibold">{friend.name}</span>
-                      {hasSentRecords && (
+                      <Show when={!!hasSentRecords}>
                         <CheckCircle2 size={14} className="text-toss-green" />
-                      )}
+                      </Show>
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
                       <span className="text-xs px-2 py-0.5 rounded-full bg-accent text-accent-foreground font-medium">
@@ -81,8 +79,8 @@ export function FriendCards({
             </div>
           </Link>
         );
-      })}
-    </div>
+      }}
+    </Each>
   );
 }
 

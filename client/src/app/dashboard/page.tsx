@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Suspense } from "@/components/ui/suspense";
+import { AsyncBoundary } from "react-flowify";
+import { Card } from "@/components/ui/card";
 import { LogClick } from "@/lib/logging";
 import { createFetchClient } from "@/lib/fetch-client";
 import { auth } from "@/lib/auth";
@@ -50,9 +51,29 @@ export default function DashboardPage() {
       </div>
 
       {/* 이벤트 목록 */}
-      <Suspense.CardSkeleton count={3}>
+      <AsyncBoundary
+        suspense={{
+          fallback: (
+            <div className="flex flex-col gap-3">
+              {[1, 2, 3].map((i) => (
+                <Card key={i} className="p-4 animate-pulse border">
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-2xl bg-muted" />
+                    <div className="flex flex-col gap-2 flex-1">
+                      <div className="h-5 w-32 bg-muted rounded" />
+                      <div className="h-3 w-24 bg-muted rounded" />
+                    </div>
+                    <div className="h-5 w-20 bg-muted rounded" />
+                  </div>
+                </Card>
+              ))}
+            </div>
+          ),
+        }}
+        errorBoundary={{ fallback: <p className="text-sm text-muted-foreground text-center py-10">데이터를 불러오지 못했습니다</p> }}
+      >
         <EventListWrapper />
-      </Suspense.CardSkeleton>
+      </AsyncBoundary>
 
     </div>
   );

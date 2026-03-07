@@ -2,12 +2,12 @@
 
 import { type ReactNode } from "react";
 import { UserPlus, Plus, X, Users, Check } from "lucide-react";
-import { use } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { RELATION_SUGGESTIONS } from "@/lib/constants";
+import { Each } from "react-flowify";
 import type { Friend } from "@/lib/api";
 import { FriendsContext, useFriendsContext, useFriends } from "../_hooks";
 
@@ -71,52 +71,56 @@ function NewFriendCard() {
 
       {/* 관계 추천 */}
       <div className="flex gap-1.5 flex-wrap">
-        {RELATION_SUGGESTIONS.map((rel) => (
-          <button
-            key={rel}
-            type="button"
-            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
-              newRelation === rel
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-secondary-foreground hover:bg-accent"
-            }`}
-            onClick={() => setNewRelation(rel)}
-          >
-            {rel}
-          </button>
-        ))}
+        <Each items={RELATION_SUGGESTIONS}>
+          {(rel) => (
+            <button
+              key={rel}
+              type="button"
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
+                newRelation === rel
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-secondary text-secondary-foreground hover:bg-accent"
+              }`}
+              onClick={() => setNewRelation(rel)}
+            >
+              {rel}
+            </button>
+          )}
+        </Each>
       </div>
 
       {/* 추가된 새 지인 목록 */}
       {newFriends.length > 0 && (
         <div className="flex flex-col gap-2 mt-4">
-          {newFriends.map((friend, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between p-3 rounded-xl bg-accent border border-border"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-sm font-semibold">
-                  {friend.name.charAt(0)}
-                </div>
-                <div>
-                  <div className="font-medium text-sm">{friend.name}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {friend.relation}
+          <Each items={newFriends}>
+            {(friend, { index }) => (
+              <div
+                key={index}
+                className="flex items-center justify-between p-3 rounded-xl bg-accent border border-border"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-sm font-semibold">
+                    {friend.name.charAt(0)}
+                  </div>
+                  <div>
+                    <div className="font-medium text-sm">{friend.name}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {friend.relation}
+                    </div>
                   </div>
                 </div>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  className="h-8 w-8 rounded-full hover:bg-destructive/10 hover:text-destructive"
+                  onClick={() => removeNewFriend(index)}
+                >
+                  <X size={14} />
+                </Button>
               </div>
-              <Button
-                type="button"
-                size="icon"
-                variant="ghost"
-                className="h-8 w-8 rounded-full hover:bg-destructive/10 hover:text-destructive"
-                onClick={() => removeNewFriend(index)}
-              >
-                <X size={14} />
-              </Button>
-            </div>
-          ))}
+            )}
+          </Each>
         </div>
       )}
     </Card>
@@ -125,14 +129,13 @@ function NewFriendCard() {
 
 // ─── ExistingFriendsList ───
 interface ExistingFriendsListProps {
-  friendsPromise: Promise<Friend[]>;
+  friends: Friend[];
 }
 
-function ExistingFriendsList({ friendsPromise }: ExistingFriendsListProps) {
-  const existingFriends = use(friendsPromise);
+function ExistingFriendsList({ friends }: ExistingFriendsListProps) {
   const { selectedFriendIds, toggleFriend } = useFriendsContext();
 
-  if (existingFriends.length === 0) return null;
+  if (friends.length === 0) return null;
 
   return (
     <Card className="p-4 mb-4 border shadow-sm">
@@ -150,47 +153,49 @@ function ExistingFriendsList({ friendsPromise }: ExistingFriendsListProps) {
         )}
       </div>
       <div className="flex flex-col gap-2 max-h-[200px] overflow-y-auto">
-        {existingFriends.map((friend) => {
-          const isSelected = selectedFriendIds.includes(friend.id);
-          return (
-            <div
-              key={friend.id}
-              className={`flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all duration-200 ${
-                isSelected
-                  ? "bg-accent border border-primary/30"
-                  : "bg-secondary hover:bg-muted border border-transparent"
-              }`}
-              onClick={() => toggleFriend(friend.id)}
-            >
-              <div className="flex items-center gap-3">
-                <div
-                  className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-200 ${
-                    isSelected
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-muted-foreground"
-                  }`}
-                >
-                  {friend.name.charAt(0)}
-                </div>
-                <div>
-                  <div className="font-medium text-sm">{friend.name}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {friend.relation}
+        <Each items={friends}>
+          {(friend) => {
+            const isSelected = selectedFriendIds.includes(friend.id);
+            return (
+              <div
+                key={friend.id}
+                className={`flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all duration-200 ${
+                  isSelected
+                    ? "bg-accent border border-primary/30"
+                    : "bg-secondary hover:bg-muted border border-transparent"
+                }`}
+                onClick={() => toggleFriend(friend.id)}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-200 ${
+                      isSelected
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    {friend.name.charAt(0)}
+                  </div>
+                  <div>
+                    <div className="font-medium text-sm">{friend.name}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {friend.relation}
+                    </div>
                   </div>
                 </div>
+                <div
+                  className={`w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 ${
+                    isSelected
+                      ? "bg-primary"
+                      : "border-2 border-muted-foreground/30"
+                  }`}
+                >
+                  {isSelected && <Check size={14} className="text-primary-foreground" />}
+                </div>
               </div>
-              <div
-                className={`w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 ${
-                  isSelected
-                    ? "bg-primary"
-                    : "border-2 border-muted-foreground/30"
-                }`}
-              >
-                {isSelected && <Check size={14} className="text-primary-foreground" />}
-              </div>
-            </div>
-          );
-        })}
+            );
+          }}
+        </Each>
       </div>
     </Card>
   );

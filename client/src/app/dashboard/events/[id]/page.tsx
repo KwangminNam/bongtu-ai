@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Suspense } from "@/components/ui/suspense";
+import { AsyncBoundary } from "react-flowify";
 import { createFetchClient } from "@/lib/fetch-client";
 import { auth } from "@/lib/auth";
 import { BackButton } from "@/components/back-button";
@@ -126,15 +126,15 @@ export default async function EventDetailPage({
       {/* 헤더 - BackButton 즉시 표시 */}
       <div className="flex items-center gap-3 mb-4">
         <BackButton />
-        <Suspense.Skeleton skeleton={<div className="h-6 w-32 bg-muted rounded animate-pulse" />}>
+        <AsyncBoundary suspense={{ fallback: <div className="h-6 w-32 bg-muted rounded animate-pulse" /> }} errorBoundary={{ fallback: <p className="text-sm text-muted-foreground">오류 발생</p> }}>
           <EventTitle id={id} />
-        </Suspense.Skeleton>
+        </AsyncBoundary>
       </div>
 
       {/* 콘텐츠 */}
-      <Suspense.Skeleton skeleton={<EventContentSkeleton />}>
+      <AsyncBoundary suspense={{ fallback: <EventContentSkeleton /> }} errorBoundary={{ fallback: <p className="text-sm text-muted-foreground text-center py-10">데이터를 불러오지 못했습니다</p> }}>
         <EventContent id={id} />
-      </Suspense.Skeleton>
+      </AsyncBoundary>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import { Suspense } from "@/components/ui/suspense";
+import { AsyncBoundary, Use, Each } from "react-flowify";
 import { Plus, Search, UserPlus, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -105,20 +105,22 @@ export function FriendsList({ friendsPromise }: FriendsListProps) {
                   className="h-11 rounded-xl"
                 />
                 <div className="flex gap-1.5 flex-wrap mt-1">
-                  {RELATION_SUGGESTIONS.map((rel) => (
-                    <button
-                      key={rel}
-                      type="button"
-                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
-                        newRelation === rel
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-secondary text-secondary-foreground hover:bg-accent"
-                      }`}
-                      onClick={() => setNewRelation(rel)}
-                    >
-                      {rel}
-                    </button>
-                  ))}
+                  <Each items={RELATION_SUGGESTIONS}>
+                    {(rel) => (
+                      <button
+                        key={rel}
+                        type="button"
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
+                          newRelation === rel
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-secondary text-secondary-foreground hover:bg-accent"
+                        }`}
+                        onClick={() => setNewRelation(rel)}
+                      >
+                        {rel}
+                      </button>
+                    )}
+                  </Each>
                 </div>
               </div>
               <Button
@@ -148,19 +150,21 @@ export function FriendsList({ friendsPromise }: FriendsListProps) {
 
       {/* 필터 */}
       <div className="flex gap-2 mb-5 overflow-x-auto pb-1">
-        {RELATION_FILTERS.map((f) => (
-          <button
-            key={f}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 shrink-0 ${
-              filter === f
-                ? "bg-primary text-primary-foreground shadow-md"
-                : "bg-secondary text-secondary-foreground hover:bg-accent"
-            }`}
-            onClick={() => setFilter(f)}
+        <Each items={RELATION_FILTERS}>
+          {(f) => (
+            <button
+              key={f}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 shrink-0 ${
+                filter === f
+                  ? "bg-primary text-primary-foreground shadow-md"
+                  : "bg-secondary text-secondary-foreground hover:bg-accent"
+              }`}
+              onClick={() => setFilter(f)}
           >
             {f}
           </button>
-        ))}
+          )}
+        </Each>
       </div>
 
       {/* 지인 목록 */}
@@ -171,14 +175,18 @@ export function FriendsList({ friendsPromise }: FriendsListProps) {
           filter={filter}
         />
       ) : (
-        <Suspense.Skeleton skeleton={<FriendCardsSkeleton />}>
-          <FriendCards
-            friendsPromise={friendsPromise}
-            search={search}
-            filter={filter}
-            onFriendsLoaded={handleFriendsLoaded}
-          />
-        </Suspense.Skeleton>
+        <AsyncBoundary suspense={{ fallback: <FriendCardsSkeleton /> }} errorBoundary={{ fallback: <p className="text-sm text-muted-foreground text-center py-10">데이터를 불러오지 못했습니다</p> }}>
+          <Use promise={friendsPromise}>
+            {(friends) => (
+              <FriendCards
+                friends={friends}
+                search={search}
+                filter={filter}
+                onFriendsLoaded={handleFriendsLoaded}
+              />
+            )}
+          </Use>
+        </AsyncBoundary>
       )}
     </div>
     </LogScreen>
@@ -203,22 +211,21 @@ function FriendCardsLocal({
     return matchSearch && matchFilter;
   });
 
-  if (filtered.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16">
-        <div className="w-16 h-16 rounded-2xl bg-accent flex items-center justify-center mb-4">
-          <Users size={28} className="text-primary" />
-        </div>
-        <p className="text-sm text-muted-foreground">
-          {friends.length === 0 ? "등록된 지인이 없습니다" : "검색 결과가 없습니다"}
-        </p>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex flex-col gap-3">
-      {filtered.map((friend) => {
+    <Each
+      items={filtered}
+      renderEmpty={
+        <div className="flex flex-col items-center justify-center py-16">
+          <div className="w-16 h-16 rounded-2xl bg-accent flex items-center justify-center mb-4">
+            <Users size={28} className="text-primary" />
+          </div>
+          <p className="text-sm text-muted-foreground">
+            {friends.length === 0 ? "등록된 지인이 없습니다" : "검색 결과가 없습니다"}
+          </p>
+        </div>
+      }
+    >
+      {(friend) => {
         const records = friend.records ?? [];
         const totalAmount = records.reduce((sum, r) => sum + r.amount, 0);
         const hasSentRecords = friend.sentRecords && friend.sentRecords.length > 0;
@@ -252,7 +259,7 @@ function FriendCardsLocal({
             </div>
           </Link>
         );
-      })}
-    </div>
+      }}
+    </Each>
   );
 }

@@ -13,6 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Each } from "react-flowify";
 import { api } from "@/lib/api";
 import { revalidateFriendDetail } from "@/lib/actions";
 
@@ -93,19 +94,21 @@ export function SentRecordForm({ friendId, friendName }: SentRecordFormProps) {
           <div>
             <Label className="mb-2 block">금액</Label>
             <div className="flex gap-2 flex-wrap mb-2">
-              {AMOUNT_BADGES.map((badge) => (
-                <Badge
-                  key={badge.value}
-                  variant={selectedAmount === badge.value ? "default" : "outline"}
-                  className="cursor-pointer px-3 py-1.5 text-sm"
-                  onClick={() => {
-                    setSelectedAmount(badge.value);
-                    setCustomAmount("");
-                  }}
-                >
-                  {badge.label}
-                </Badge>
-              ))}
+              <Each items={AMOUNT_BADGES}>
+                {(badge) => (
+                  <Badge
+                    key={badge.value}
+                    variant={selectedAmount === badge.value ? "default" : "outline"}
+                    className="cursor-pointer px-3 py-1.5 text-sm"
+                    onClick={() => {
+                      setSelectedAmount(badge.value);
+                      setCustomAmount("");
+                    }}
+                  >
+                    {badge.label}
+                  </Badge>
+                )}
+              </Each>
             </div>
             <Input
               placeholder="직접 입력 (원)"
@@ -135,16 +138,18 @@ export function SentRecordForm({ friendId, friendName }: SentRecordFormProps) {
           <div>
             <Label className="mb-2 block">행사 유형</Label>
             <div className="flex gap-2 flex-wrap">
-              {EVENT_TYPES.map((type) => (
-                <Badge
-                  key={type.value}
-                  variant={eventType === type.value ? "default" : "outline"}
-                  className="cursor-pointer px-3 py-1.5 text-sm"
-                  onClick={() => setEventType(type.value)}
-                >
-                  {type.label}
-                </Badge>
-              ))}
+              <Each items={EVENT_TYPES}>
+                {(type) => (
+                  <Badge
+                    key={type.value}
+                    variant={eventType === type.value ? "default" : "outline"}
+                    className="cursor-pointer px-3 py-1.5 text-sm"
+                    onClick={() => setEventType(type.value)}
+                  >
+                    {type.label}
+                  </Badge>
+                )}
+              </Each>
             </div>
           </div>
 

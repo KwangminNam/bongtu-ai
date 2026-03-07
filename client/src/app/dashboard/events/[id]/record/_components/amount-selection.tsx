@@ -5,6 +5,7 @@ import { Wallet, Minus, Plus } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Each } from "react-flowify";
 import { RECEIVED_AMOUNT_BADGES, GOLD_KARAT_OPTIONS } from "@/lib/constants";
 import type { GoldKarat } from "@/lib/types";
 import { AmountContext, useAmountContext, useAmount } from "../_hooks";
@@ -84,20 +85,22 @@ function CashSelector() {
   return (
     <>
       <div className="grid grid-cols-4 gap-2 mb-3">
-        {RECEIVED_AMOUNT_BADGES.map((badge) => (
-          <button
-            key={badge.value}
-            type="button"
-            className={`py-3 px-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
-              selectedAmount === badge.value
-                ? "bg-primary text-primary-foreground shadow-md"
-                : "bg-secondary text-secondary-foreground hover:bg-accent"
-            }`}
-            onClick={() => selectAmount(badge.value)}
-          >
-            {badge.label}
-          </button>
-        ))}
+        <Each items={RECEIVED_AMOUNT_BADGES}>
+          {(badge) => (
+            <button
+              key={badge.value}
+              type="button"
+              className={`py-3 px-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                selectedAmount === badge.value
+                  ? "bg-primary text-primary-foreground shadow-md"
+                  : "bg-secondary text-secondary-foreground hover:bg-accent"
+              }`}
+              onClick={() => selectAmount(badge.value)}
+            >
+              {badge.label}
+            </button>
+          )}
+        </Each>
       </div>
       <div className="relative">
         <Input
@@ -123,16 +126,18 @@ function GoldSelector() {
 
   return (
     <div className="space-y-2">
-      {GOLD_KARAT_OPTIONS.map((option) => (
-        <GoldKaratRow
-          key={option.value}
-          karat={option.value}
-          label={option.label}
-          description={option.description}
-          quantity={goldQuantities[option.value]}
-          onChange={(qty) => setGoldQuantity(option.value, qty)}
-        />
-      ))}
+      <Each items={GOLD_KARAT_OPTIONS}>
+        {(option) => (
+          <GoldKaratRow
+            key={option.value}
+            karat={option.value}
+            label={option.label}
+            description={option.description}
+            quantity={goldQuantities[option.value]}
+            onChange={(qty) => setGoldQuantity(option.value, qty)}
+          />
+        )}
+      </Each>
     </div>
   );
 }

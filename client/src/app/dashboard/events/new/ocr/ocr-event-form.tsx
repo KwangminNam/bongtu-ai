@@ -21,6 +21,7 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { BackButton } from "@/components/back-button";
 import { api, OcrRecord } from "@/lib/api";
 import { revalidateDashboard } from "@/lib/actions";
+import { Each } from "react-flowify";
 import { cn } from "@/lib/utils";
 import { LogScreen, LogClick } from "@/lib/logging";
 
@@ -340,40 +341,42 @@ export function OcrEventForm() {
               </div>
 
               <div className="flex flex-col gap-2 max-h-[400px] overflow-y-auto">
-                {records.map((record, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.03 }}
-                    className="flex items-center gap-2 p-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700"
-                  >
-                    <Input
-                      value={record.name}
-                      onChange={(e) => updateRecord(index, "name", e.target.value)}
-                      placeholder="이름"
-                      className="flex-1 h-10 border-0 bg-slate-50 dark:bg-slate-900 rounded-xl"
-                    />
-                    <div className="relative">
-                      <Input
-                        type="number"
-                        value={record.amount || ""}
-                        onChange={(e) => updateRecord(index, "amount", Number(e.target.value))}
-                        placeholder="금액"
-                        className="w-28 h-10 border-0 bg-slate-50 dark:bg-slate-900 rounded-xl pr-8"
-                      />
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                        원
-                      </span>
-                    </div>
-                    <button
-                      onClick={() => removeRecord(index)}
-                      className="p-2 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20"
+                <Each items={records}>
+                  {(record, { index }) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.03 }}
+                      className="flex items-center gap-2 p-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700"
                     >
-                      <Trash2 size={18} />
-                    </button>
-                  </motion.div>
-                ))}
+                      <Input
+                        value={record.name}
+                        onChange={(e) => updateRecord(index, "name", e.target.value)}
+                        placeholder="이름"
+                        className="flex-1 h-10 border-0 bg-slate-50 dark:bg-slate-900 rounded-xl"
+                      />
+                      <div className="relative">
+                        <Input
+                          type="number"
+                          value={record.amount || ""}
+                          onChange={(e) => updateRecord(index, "amount", Number(e.target.value))}
+                          placeholder="금액"
+                          className="w-28 h-10 border-0 bg-slate-50 dark:bg-slate-900 rounded-xl pr-8"
+                        />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                          원
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => removeRecord(index)}
+                        className="p-2 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </motion.div>
+                  )}
+                </Each>
               </div>
 
               {imagePreview && (
@@ -420,26 +423,28 @@ export function OcrEventForm() {
               <div className="flex flex-col gap-3">
                 <span className="text-sm font-semibold">어떤 경조사인가요?</span>
                 <div className="grid grid-cols-2 gap-3">
-                  {EVENT_TYPES.map((eventType) => (
-                    <motion.button
-                      key={eventType.value}
-                      type="button"
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.97 }}
-                      onClick={() => setType(eventType.value)}
-                      className={cn(
-                        "relative p-4 rounded-2xl border-2 transition-all",
-                        type === eventType.value
-                          ? `bg-gradient-to-br ${eventType.gradient} border-transparent ${eventType.ring} ring-2 ring-offset-2 dark:ring-offset-slate-900`
-                          : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
-                      )}
-                    >
-                      <div className="flex flex-col items-start gap-1">
-                        <span className="text-2xl">{eventType.emoji}</span>
-                        <span className="font-semibold text-sm">{eventType.label}</span>
-                      </div>
-                    </motion.button>
-                  ))}
+                  <Each items={EVENT_TYPES}>
+                    {(eventType) => (
+                      <motion.button
+                        key={eventType.value}
+                        type="button"
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => setType(eventType.value)}
+                        className={cn(
+                          "relative p-4 rounded-2xl border-2 transition-all",
+                          type === eventType.value
+                            ? `bg-gradient-to-br ${eventType.gradient} border-transparent ${eventType.ring} ring-2 ring-offset-2 dark:ring-offset-slate-900`
+                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
+                        )}
+                      >
+                        <div className="flex flex-col items-start gap-1">
+                          <span className="text-2xl">{eventType.emoji}</span>
+                          <span className="font-semibold text-sm">{eventType.label}</span>
+                        </div>
+                      </motion.button>
+                    )}
+                  </Each>
                 </div>
               </div>
 

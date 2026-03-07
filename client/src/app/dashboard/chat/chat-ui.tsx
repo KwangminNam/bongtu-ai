@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { BackButton } from "@/components/back-button";
+import { Each } from "react-flowify";
 import { cn } from "@/lib/utils";
 import { LogScreen, LogClick } from "@/lib/logging";
 
@@ -161,55 +162,59 @@ export function ChatUI() {
               경조사 기록 분석, 이벤트 생성, 지인 추가 등을 도와드려요
             </p>
             <div className="flex flex-wrap gap-2 justify-center max-w-sm">
-              {SUGGESTIONS.map((suggestion) => (
-                <Button
-                  key={suggestion}
-                  variant="outline"
-                  size="sm"
-                  className="text-xs"
-                  onClick={() => handleSuggestionClick(suggestion)}
-                >
-                  {suggestion}
-                </Button>
-              ))}
+              <Each items={SUGGESTIONS}>
+                {(suggestion) => (
+                  <Button
+                    key={suggestion}
+                    variant="outline"
+                    size="sm"
+                    className="text-xs"
+                    onClick={() => handleSuggestionClick(suggestion)}
+                  >
+                    {suggestion}
+                  </Button>
+                )}
+              </Each>
             </div>
           </div>
         ) : (
           <>
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={cn(
-                  "flex gap-3",
-                  message.role === "user" ? "justify-end" : "justify-start"
-                )}
-              >
-                {message.role === "assistant" && (
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                    <Bot size={16} className="text-primary" />
-                  </div>
-                )}
-                <Card
+            <Each items={messages}>
+              {(message) => (
+                <div
+                  key={message.id}
                   className={cn(
-                    "px-4 py-3 max-w-[80%]",
-                    message.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted"
+                    "flex gap-3",
+                    message.role === "user" ? "justify-end" : "justify-start"
                   )}
                 >
-                  <p className="text-sm whitespace-pre-wrap">
-                    {message.content || (
-                      <Loader2 size={16} className="animate-spin text-muted-foreground" />
+                  {message.role === "assistant" && (
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                      <Bot size={16} className="text-primary" />
+                    </div>
+                  )}
+                  <Card
+                    className={cn(
+                      "px-4 py-3 max-w-[80%]",
+                      message.role === "user"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted"
                     )}
-                  </p>
-                </Card>
-                {message.role === "user" && (
-                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
-                    <User size={16} className="text-primary-foreground" />
-                  </div>
-                )}
-              </div>
-            ))}
+                  >
+                    <p className="text-sm whitespace-pre-wrap">
+                      {message.content || (
+                        <Loader2 size={16} className="animate-spin text-muted-foreground" />
+                      )}
+                    </p>
+                  </Card>
+                  {message.role === "user" && (
+                    <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
+                      <User size={16} className="text-primary-foreground" />
+                    </div>
+                  )}
+                </div>
+              )}
+            </Each>
             {/* 로딩 중이고 마지막 메시지가 user인 경우 로딩 스피너 표시 */}
             {isLoading && messages.length > 0 && messages[messages.length - 1]?.role === "user" && (
               <div className="flex gap-3 justify-start">

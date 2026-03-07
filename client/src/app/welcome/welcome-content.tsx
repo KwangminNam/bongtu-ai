@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { OnboardingLottie } from "@/components/lottie-animations";
 import { LogScreen } from "@/lib/logging";
 import { itemVariants } from "@/lib/animations";
+import { Show } from "react-flowify";
 
 const AUTO_REDIRECT_MS = 2000;
 
@@ -20,7 +21,9 @@ export function WelcomeContent({ hasEvents }: { hasEvents: boolean }) {
 
   return (
     <LogScreen params={{ hasEvents }}>
-      {hasEvents ? <ReturningUserView /> : <NewUserView />}
+      <Show when={hasEvents} fallback={<NewUserView />}>
+        <ReturningUserView />
+      </Show>
     </LogScreen>
   );
 }

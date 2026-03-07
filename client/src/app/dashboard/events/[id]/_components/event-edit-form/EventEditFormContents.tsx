@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/ui/date-picker";
+import { Each } from "react-flowify";
 import { cn } from "@/lib/utils";
 import { EVENT_TYPES } from "@/lib/constants";
 
@@ -44,23 +45,25 @@ export function EventEditFormContents({
       <div className="flex flex-col gap-2">
         <Label className="text-sm font-medium">이벤트 유형</Label>
         <div className="grid grid-cols-2 gap-2">
-          {EVENT_TYPES.map((eventType) => (
-            <motion.button
-              key={eventType.value}
-              type="button"
-              whileTap={{ scale: 0.97 }}
-              onClick={() => onTypeChange(eventType.value)}
-              className={cn(
-                "p-3 rounded-xl border-2 transition-all flex items-center gap-2",
-                type === eventType.value
-                  ? `bg-gradient-to-br ${eventType.gradient} border-transparent ${eventType.ring} ring-2 ring-offset-1`
-                  : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-slate-300"
-              )}
-            >
-              <span className="text-lg">{eventType.emoji}</span>
-              <span className="font-medium text-sm">{eventType.label}</span>
-            </motion.button>
-          ))}
+          <Each items={EVENT_TYPES}>
+            {(eventType) => (
+              <motion.button
+                key={eventType.value}
+                type="button"
+                whileTap={{ scale: 0.97 }}
+                onClick={() => onTypeChange(eventType.value)}
+                className={cn(
+                  "p-3 rounded-xl border-2 transition-all flex items-center gap-2",
+                  type === eventType.value
+                    ? `bg-gradient-to-br ${eventType.gradient} border-transparent ${eventType.ring} ring-2 ring-offset-1`
+                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-slate-300"
+                )}
+              >
+                <span className="text-lg">{eventType.emoji}</span>
+                <span className="font-medium text-sm">{eventType.label}</span>
+              </motion.button>
+            )}
+          </Each>
         </div>
       </div>
 

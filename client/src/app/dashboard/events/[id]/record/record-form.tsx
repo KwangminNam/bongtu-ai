@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Suspense } from "@/components/ui/suspense";
+import { AsyncBoundary, Use } from "react-flowify";
 import { BackButton } from "@/components/back-button";
 import { BottomCTA } from "@/components/bottom-cta";
 import { api, type Friend } from "@/lib/api";
@@ -135,9 +135,11 @@ function RecordFormContent({
         <FriendInput.NewFriendCard />
 
         {/* 3. 기존 지인 선택 */}
-        <Suspense.Skeleton skeleton={<FriendInput.ExistingFriendsListSkeleton />}>
-          <FriendInput.ExistingFriendsList friendsPromise={friendsPromise} />
-        </Suspense.Skeleton>
+        <AsyncBoundary suspense={{ fallback: <FriendInput.ExistingFriendsListSkeleton /> }} errorBoundary={{ fallback: <p className="text-sm text-muted-foreground text-center py-4">지인 목록을 불러오지 못했습니다</p> }}>
+          <Use promise={friendsPromise}>
+            {(friends) => <FriendInput.ExistingFriendsList friends={friends} />}
+          </Use>
+        </AsyncBoundary>
 
         {/* 4. 메모 */}
         <MemoInput value={memo} onChange={setMemo} />

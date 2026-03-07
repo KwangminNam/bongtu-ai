@@ -16,6 +16,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Each } from "react-flowify";
 import { EVENT_TYPE_LABELS } from "@/lib/constants";
 import { useSentRecordItem } from "../_hooks/useSentRecordItem";
 import type { SentRecord } from "@/lib/api";
@@ -111,16 +112,18 @@ export function SentRecordItem({ record, friendId }: SentRecordItemProps) {
             </div>
 
             <div className="flex gap-1.5 flex-wrap">
-              {EVENT_TYPES.map((type) => (
-                <Badge
-                  key={type.value}
-                  variant={eventType === type.value ? "default" : "outline"}
-                  className="cursor-pointer px-2.5 py-1 text-xs"
-                  onClick={() => !isSaving && setEventType(type.value)}
-                >
-                  {type.label}
-                </Badge>
-              ))}
+              <Each items={EVENT_TYPES}>
+                {(type) => (
+                  <Badge
+                    key={type.value}
+                    variant={eventType === type.value ? "default" : "outline"}
+                    className="cursor-pointer px-2.5 py-1 text-xs"
+                    onClick={() => !isSaving && setEventType(type.value)}
+                  >
+                    {type.label}
+                  </Badge>
+                )}
+              </Each>
             </div>
 
             <Input
